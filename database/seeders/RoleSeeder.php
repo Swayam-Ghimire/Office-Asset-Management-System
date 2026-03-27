@@ -35,7 +35,7 @@ class RoleSeeder extends Seeder
         }
 
         // Assign permissions to roles
-        $admin->givePermissionTo(['manage users', 'manage assets', 'approve requests', 'view all assets', 'manage categories', 'view logs']);
+        $admin->givePermissionTo($permissions);
         $employee->givePermissionTo(['request asset', 'view own assets', 'report issues', 'view maintenance report']);
 
     }
