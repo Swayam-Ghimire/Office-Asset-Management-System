@@ -8,9 +8,7 @@ import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import Footer from "@/Components/Footer.vue";
 import { Link } from "@inertiajs/vue3";
 
-defineProps({
-    isAdmin: Boolean,
-});
+
 const showingNavigationDropdown = ref(false);
 </script>
 
@@ -24,7 +22,7 @@ const showingNavigationDropdown = ref(false);
                         <div class="flex">
                             <!-- Logo -->
                             <div
-                                v-if="isAdmin"
+                                v-if="$page.props.isAdmin"
                                 class="flex shrink-0 items-center"
                             >
                                 <Link :href="route('dashboard')">
@@ -34,7 +32,7 @@ const showingNavigationDropdown = ref(false);
                                 </Link>
                             </div>
                             <div v-else class="flex shrink-0 items-center">
-                                <Link :href="route('home')">
+                                <Link :href="route('employee-dashboard')">
                                     <ApplicationLogo
                                         class="block h-9 w-auto fill-current text-gray-800"
                                     />
@@ -52,9 +50,16 @@ const showingNavigationDropdown = ref(false);
                                     Home
                                 </NavLink>
                                 <NavLink
-                                    v-if="isAdmin"
+                                    v-if="$page.props.isAdmin"
                                     :href="route('dashboard')"
                                     :active="route().current('dashboard')"
+                                >
+                                    Dashboard
+                                </NavLink>
+                                <NavLink
+                                    v-else
+                                    :href="route('employee-dashboard')"
+                                    :active="route().current('employee-dashboard')"
                                 >
                                     Dashboard
                                 </NavLink>
@@ -77,7 +82,7 @@ const showingNavigationDropdown = ref(false);
                                                     class="w-8 h-8 rounded-full me-2"
                                                     :src="
                                                         $page.props.auth.user
-                                                            .profile_photo_url || 'https://ui-avatars.com/api/?name=' +
+                                                            .img_path || 'https://ui-avatars.com/api/?name=' +
                                                               $page.props.auth.user
                                                                   .name +
                                                               '&color=ffffff&background=DC143C' 

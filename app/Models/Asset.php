@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Asset extends Model
 {
-    protected $fillable = ['name', 'asset_code', 'category_id', 'brand', 'purchase_date', 'condition', 'status', 'img_path'];
+    protected $fillable = ['model_name', 'category_id', 'brand', 'purchase_date', 'condition', 'status', 'img_path'];
 
     public function requests()
     {
