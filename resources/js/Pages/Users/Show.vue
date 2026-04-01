@@ -1,5 +1,6 @@
 <script setup>
-// Asset request create page
+// Users show page
+
 </script>
 
 <template>

@@ -154,10 +154,10 @@ const submit = () => {
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
                                 >
                                     <option value="available">Available</option>
-                                    <option value="assigned">Assigned</option>
-                                    <option value="under_maintenance">
+                                    <option value="not available">Not Available</option>
+                                    <!-- <option value="under_maintenance">
                                         Under Maintenance
-                                    </option>
+                                    </option> -->
                                 </select>
                                 <InputError
                                     class="mt-2"

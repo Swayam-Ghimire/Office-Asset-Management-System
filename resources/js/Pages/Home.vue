@@ -108,7 +108,7 @@ const statusDot = {
                         <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-lg">✅</div>
                         <div>
                             <p class="text-xs text-gray-500 font-medium">Assigned to you</p>
-                            <p class="text-2xl font-bold text-blue-600">{{stats.assigned_to_you.length }}</p>
+                            <p class="text-2xl font-bold text-blue-600">{{ stats.assigned_to_you }}</p>
                         </div>
                     </div>
                     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">

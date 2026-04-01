@@ -12,7 +12,7 @@ const props = defineProps({
 
 // Reactive filter state
 const search = ref(props.filters?.search ?? "");
-const status = ref(props.filters?.status ?? "");
+const status = ref(props.filters?.status ?? null);
 const selectedDepartment = ref(props.filters?.department ?? "");
 
 function applyFilters() {
@@ -32,8 +32,8 @@ function applyFilters() {
 
 function resetFilters() {
     search.value = "";
-    status.value = "";
-    department.value = "";
+    status.value = null;
+    selectedDepartment.value = "";
     router.get(route("users.index"));
 }
 
@@ -44,7 +44,7 @@ const deleteUser = (id) => {
 };
 
 const toggleStatus = (user) => {
-    const newStatus = user.status === "active" ? "inactive" : "active";
+    const newStatus = user.status === 1 ? 0 : 1;
     router.patch(route("users.update-status", user.id), { status: newStatus });
 };
 </script>
@@ -111,16 +111,16 @@ const toggleStatus = (user) => {
                             v-model="status"
                             class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
                         >
-                            <option value="">All Statuses</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
+                            <option value="null">All Statuses</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
                         </select>
                     </div>
 
                     <div class="w-48">
                         <label
                             class="block text-xs font-medium text-gray-600 mb-1"
-                            >Category</label
+                            >Department</label
                         >
                         <select
                             v-model="selectedDepartment"
@@ -135,6 +135,20 @@ const toggleStatus = (user) => {
                                 {{ department.name }}
                             </option>
                         </select>
+                    </div>
+                    <div class="flex gap-2 pb-0.5">
+                        <button
+                            @click="applyFilters"
+                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        >
+                            Filter
+                        </button>
+                        <button
+                            @click="resetFilters"
+                            class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        >
+                            Reset
+                        </button>
                     </div>
                 </div>
 

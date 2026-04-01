@@ -6,6 +6,8 @@ use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -22,8 +24,8 @@ class UserController extends Controller
             });
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        if ($request->has('status') && $request->status !== null) {
+            $query->where('status', (int) $request->status);
         }
 
         if ($request->filled('department')) {
@@ -43,11 +45,9 @@ class UserController extends Controller
     public function create()
     {
         $departments = Department::all();
-        $roles = Role::all();
 
         return Inertia::render('Users/Create', [
             'departments' => $departments,
-            'roles' => $roles,
         ]);
     }
 
@@ -56,21 +56,27 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+            // 'password' => 'required|string|min:8|confirmed',
             'department_id' => 'nullable|exists:departments,id',
             'role' => 'required|in:admin,employee',
-            'status' => 'required|in:active,inactive',
+            'status' => 'required',
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make(Str::random(8)),
             'department_id' => $validated['department_id'] ?? null,
             'status' => $validated['status'],
         ]);
 
         $user->assignRole($validated['role']);
+
+        // Email to the user ..... for password reset link
+
+        Password::broker()->sendResetLink([
+            'email' => $user->email
+        ]);
 
         return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
@@ -123,9 +129,14 @@ class UserController extends Controller
         return back()->with('success', 'User status updated.');
     }
 
-    public function show()
+    public function show(User $user)
     {
         // Inertia render show page
+        
+        return Inertia::render('Users/Show', [
+            'user' => $user->load(['department', 'roles'])
+        ]);
+
     }
 
     public function destroy(Request $request, User $user)

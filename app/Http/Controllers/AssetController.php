@@ -45,7 +45,7 @@ class AssetController extends Controller
             'total'       => Asset::count(),
             'available'   => Asset::where('status', 'available')->count(),
             'assigned'    => Asset::where('status', 'assigned')->count(),
-            'assigned_to_you' => $request->user()->assignments()->with('asset')->get()->pluck('asset'), 
+            'assigned_to_you' => $request->user()->assignments()->where('status', 'assigned')->count(), 
             'maintenance' => Asset::where('status', 'under_maintenance')->count(),
         ];
 

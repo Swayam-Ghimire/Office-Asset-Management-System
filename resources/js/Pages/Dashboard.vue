@@ -55,10 +55,7 @@ const categoryData = computed(() => {
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                         Add Asset
                     </Link>
-                    <Link v-if="!$page.props.isAdmin" :href="route('asset-requests.create')" class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Request Asset
-                    </Link>
+
                 </div>
             </div>
         </template>
@@ -235,110 +232,6 @@ const categoryData = computed(() => {
                         </Link>
                     </div>
                 </template>
-
-                <!-- ─── EMPLOYEE DASHBOARD ─── -->
-                <template v-else>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-                            <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">My Assets</p>
-                            <p class="text-3xl font-bold text-blue-600">{{ stats.my_assets }}</p>
-                            <p class="text-xs text-gray-400 mt-1">Currently assigned</p>
-                        </div>
-                        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-                            <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Pending</p>
-                            <p class="text-3xl font-bold text-amber-600">{{ stats.pending_requests }}</p>
-                            <p class="text-xs text-gray-400 mt-1">Awaiting approval</p>
-                        </div>
-                        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-                            <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Approved</p>
-                            <p class="text-3xl font-bold text-emerald-600">{{ stats.approved_requests }}</p>
-                            <p class="text-xs text-gray-400 mt-1">Total approved</p>
-                        </div>
-                        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-                            <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Returned</p>
-                            <p class="text-3xl font-bold text-gray-600">{{ stats.returned_assets }}</p>
-                            <p class="text-xs text-gray-400 mt-1">Previously returned</p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                        <!-- My Assets -->
-                        <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                                <h2 class="font-semibold text-gray-900">My Assets</h2>
-                                <Link :href="route('asset-assignments.index')" class="text-xs text-red-600 hover:underline">View all</Link>
-                            </div>
-                            <div v-if="myAssignments?.length > 0" class="divide-y divide-gray-50">
-                                <div v-for="a in myAssignments" :key="a.id" class="px-6 py-4 flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-xl shrink-0">
-                                        {{
-                                            a.asset?.category?.name?.toLowerCase().includes('laptop') ? '💻' :
-                                            a.asset?.category?.name?.toLowerCase().includes('monitor') ? '🖥️' :
-                                            a.asset?.category?.name?.toLowerCase().includes('mouse') ? '🖱️' :
-                                            a.asset?.category?.name?.toLowerCase().includes('keyboard') ? '⌨️' : '📦'
-                                        }}
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <p class="font-medium text-gray-900 text-sm truncate">{{ a.asset?.name }}</p>
-                                        <p class="text-xs text-gray-400 font-mono">{{ a.asset?.asset_code }}</p>
-                                        <p class="text-xs text-gray-400 mt-0.5">Since {{ new Date(a.assigned_date).toLocaleDateString() }}</p>
-                                    </div>
-                                    <button
-                                        @click="returnAsset(a.id)"
-                                        class="text-xs border border-gray-200 hover:border-rose-300 hover:text-rose-600 text-gray-600 px-3 py-1.5 rounded-lg transition-colors shrink-0"
-                                    >
-                                        Return
-                                    </button>
-                                </div>
-                            </div>
-                            <div v-else class="px-6 py-12 text-center">
-                                <div class="text-4xl mb-3">📭</div>
-                                <p class="text-sm text-gray-500">No assets assigned yet</p>
-                                <Link :href="route('home')" class="text-xs text-red-600 mt-2 inline-block hover:underline">Browse assets →</Link>
-                            </div>
-                        </div>
-
-                        <!-- My Requests -->
-                        <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                                <h2 class="font-semibold text-gray-900">My Requests</h2>
-                                <Link :href="route('asset-requests.index')" class="text-xs text-red-600 hover:underline">View all</Link>
-                            </div>
-                            <div v-if="myRequests?.length > 0" class="divide-y divide-gray-50">
-                                <div v-for="req in myRequests" :key="req.id" class="px-6 py-4 flex items-center gap-4">
-                                    <div class="flex-1 min-w-0">
-                                        <p class="font-medium text-gray-900 text-sm truncate">{{ req.asset?.name }}</p>
-                                        <p class="text-xs text-gray-400">{{ new Date(req.requested_at).toLocaleDateString() }}</p>
-                                    </div>
-                                    <span :class="['text-xs px-2.5 py-1 rounded-full font-medium shrink-0', statusColors[req.status]]">
-                                        {{ req.status.charAt(0).toUpperCase() + req.status.slice(1) }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div v-else class="px-6 py-12 text-center">
-                                <div class="text-4xl mb-3">📋</div>
-                                <p class="text-sm text-gray-500">No requests yet</p>
-                                <Link :href="route('asset-requests.create')" class="text-xs text-red-600 mt-2 inline-block hover:underline">Make a request →</Link>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <Link :href="route('home')" class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-red-200 hover:shadow-md transition-all group">
-                            <div class="text-3xl mb-3">📦</div>
-                            <p class="font-semibold text-gray-900 text-sm group-hover:text-red-600 transition-colors">Browse Assets</p>
-                            <p class="text-xs text-gray-400 mt-0.5">Find and request assets</p>
-                        </Link>
-                        <Link :href="route('asset-requests.create')" class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-red-200 hover:shadow-md transition-all group">
-                            <div class="text-3xl mb-3">➕</div>
-                            <p class="font-semibold text-gray-900 text-sm group-hover:text-red-600 transition-colors">New Request</p>
-                            <p class="text-xs text-gray-400 mt-0.5">Submit an asset request</p>
-                        </Link>
-                    </div>
-                </template>
-
             </div>
         </div>
     </AuthenticatedLayout>
