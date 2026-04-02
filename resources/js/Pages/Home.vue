@@ -38,7 +38,7 @@ function requestAsset(assetId) {
 
 const statusColors = {
     available:        'bg-emerald-100 text-emerald-700 border-emerald-200',
-    assigned:         'bg-blue-100 text-blue-700 border-blue-200',
+    not_available:         'bg-blue-100 text-blue-700 border-blue-200',
     under_maintenance:'bg-amber-100 text-amber-700 border-amber-200',
 };
 
@@ -50,7 +50,7 @@ const conditionColors = {
 
 const statusDot = {
     available:        'bg-emerald-400',
-    assigned:         'bg-blue-400',
+    not_available:         'bg-blue-400',
     under_maintenance:'bg-amber-400',
 };
 </script>
@@ -82,7 +82,7 @@ const statusDot = {
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
                 <!-- Stats Bar -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
                         <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-lg">📦</div>
                         <div>
@@ -98,24 +98,10 @@ const statusDot = {
                         </div>
                     </div>
                     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-lg">🔗</div>
-                        <div>
-                            <p class="text-xs text-gray-500 font-medium">Assigned</p>
-                            <p class="text-2xl font-bold text-blue-600">{{ stats.assigned }}</p>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
                         <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-lg">✅</div>
                         <div>
                             <p class="text-xs text-gray-500 font-medium">Assigned to you</p>
                             <p class="text-2xl font-bold text-blue-600">{{ stats.assigned_to_you }}</p>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-lg">🔧</div>
-                        <div>
-                            <p class="text-xs text-gray-500 font-medium">Maintenance</p>
-                            <p class="text-2xl font-bold text-amber-600">{{ stats.maintenance }}</p>
                         </div>
                     </div>
                 </div>
@@ -134,7 +120,7 @@ const statusDot = {
                                     v-model="search"
                                     @keyup.enter="applyFilters"
                                     type="text"
-                                    placeholder="Name, code, brand…"
+                                    placeholder="Name, brand…"
                                     class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
                                 />
                             </div>
@@ -155,7 +141,7 @@ const statusDot = {
                             <select v-model="selectedStatus" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none">
                                 <option value="">All Statuses</option>
                                 <option value="available">Available</option>
-                                <option value="assigned">Assigned</option>
+                                <option value="not_available">Not available</option>
                                 <option value="under_maintenance">Maintenance</option>
                             </select>
                         </div>
@@ -224,8 +210,6 @@ const statusDot = {
                                 </span>
                             </div>
 
-                            <p class="text-xs text-gray-400 font-mono mb-3">{{ asset.asset_code }}</p>
-
                             <div class="space-y-1 text-xs text-gray-500 mb-4">
                                 <div class="flex items-center gap-1.5">
                                     <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -251,7 +235,7 @@ const statusDot = {
                                 </Link>
 
                                 <!-- Admin actions -->
-                                <template v-if="isAdmin">
+                                <template v-if="$page.props.isAdmin">
                                     <Link
                                         :href="route('assets.edit', asset.id)"
                                         class="flex-1 text-center text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 rounded-lg transition-colors"
@@ -263,7 +247,7 @@ const statusDot = {
                                 <!-- Employee: request -->
                                 <template v-else>
                                     <button
-                                        v-if="asset.status === 'available'"
+                                        v-if="asset.status === 'available' && asset.condition !== 'damaged'"
                                         @click="requestAsset(asset.id)"
                                         class="flex-1 text-xs bg-red-600 hover:bg-red-700 text-white py-1.5 rounded-lg transition-colors font-medium"
                                     >

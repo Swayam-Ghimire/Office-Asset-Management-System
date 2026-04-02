@@ -12,6 +12,7 @@ defineProps({
 
 const form = useForm({
     model_name: "",
+    // quantity: 1,
     category_id: "",
     brand: "",
     purchase_date: "",
@@ -30,7 +31,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head :title="Create" />
+    <Head title="Create Asset" />
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -44,7 +45,7 @@ const submit = () => {
                     class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-8"
                 >
                     <form @submit.prevent="submit" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-2 md:grid-cols-2 gap-6">
                             <div>
                                 <InputLabel for="model_name" value="Model Asset Name" />
                                 <TextInput
@@ -60,6 +61,17 @@ const submit = () => {
                                     :message="form.errors.model_name"
                                 />
                             </div>
+                            <!-- <div>
+                                <InputLabel
+                                    for="quantity"
+                                    value="Quantity"
+                                />
+                                <TextInput id="queantity" type="number" class="mt-1 block w-full" v-model="form.quantity" min="1" required />
+                                <InputError
+                                    class="mt-2"
+                                    :message="form.errors.quantity"
+                                />
+                            </div> -->
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -154,10 +166,10 @@ const submit = () => {
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
                                 >
                                     <option value="available">Available</option>
-                                    <option value="not available">Not Available</option>
-                                    <!-- <option value="under_maintenance">
+                                    <option value="not_available">Not Available</option>
+                                    <option value="under_maintenance">
                                         Under Maintenance
-                                    </option> -->
+                                    </option>
                                 </select>
                                 <InputError
                                     class="mt-2"

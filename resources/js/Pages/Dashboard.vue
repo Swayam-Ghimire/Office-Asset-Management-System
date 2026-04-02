@@ -12,11 +12,11 @@ const props = defineProps({
 });
 
 function approveRequest(id) {
-    router.post(route('asset-requests.approve', id));
+    router.put(route('asset-requests.approve', id), {}, { preserveScroll: true });
 }
 
 function rejectRequest(id) {
-    router.post(route('asset-requests.reject', id));
+    router.put(route('asset-requests.reject', id), {}, { preserveScroll: true });
 }
 
 const statusColors = {

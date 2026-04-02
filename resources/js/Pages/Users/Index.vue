@@ -43,10 +43,10 @@ const deleteUser = (id) => {
     }
 };
 
-const toggleStatus = (user) => {
-    const newStatus = user.status === 1 ? 0 : 1;
-    router.patch(route("users.update-status", user.id), { status: newStatus });
-};
+// const toggleStatus = (user) => {
+//     const newStatus = user.status === 1 ? 0 : 1;
+//     router.patch(route("users.update-status", user.id), { status: newStatus });
+// };
 </script>
 
 <template>
@@ -238,7 +238,6 @@ const toggleStatus = (user) => {
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         <button
-                                            @click="toggleStatus(user)"
                                             :class="
                                                 user.status === 1
                                                     ? 'bg-emerald-100 text-emerald-700'
