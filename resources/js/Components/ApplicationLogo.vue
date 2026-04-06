@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1">
         <!-- Icon -->
         <!-- <svg
             width="36"
@@ -9,7 +9,7 @@
             viewBox="0 0 48 48"
             fill="none"
             xmlns="http://www.w3.org/2000/svg" -->
-        >
+        <!-- > -->
             <!-- Box / Asset -->
             <!-- <rect x="8" y="12" width="32" height="24" rx="6" fill="red" /> -->
 
@@ -19,7 +19,8 @@
                 fill="white"
             />
         </svg> -->
-        
+
+        <img class="w-10 h-10 rounded-full me-2" src="../../../public/storage/logo3.png" alt="Logo">        
 
         <!-- Text -->
         <span class="text-xl font-bold text-white-800">

@@ -44,9 +44,9 @@ class AssetController extends Controller
         $stats = [
             'total'       => Asset::count(),
             'available'   => Asset::where('status', 'available')->count(),
-            'assigned'    => Asset::where('status', 'assigned')->count(),
+            // 'assigned'    => Asset::where('status', 'assigned')->count(),
             'assigned_to_you' => $request->user()->assignments()->where('status', 'assigned')->count(), 
-            'maintenance' => Asset::where('status', 'under_maintenance')->count(),
+            // 'maintenance' => Asset::where('status', 'under_maintenance')->count(),
         ];
 
         return Inertia::render('Home', [
@@ -74,8 +74,8 @@ class AssetController extends Controller
             'brand'         => 'nullable|string|max:255',
             'purchase_date' => 'nullable|date',
             'condition'     => 'required|in:new,good,damaged',
-            'status'        => 'required|in:available,assigned,under_maintenance',
-            'img_path'      => 'nullable|image|max:10000',
+            'status'        => 'required|string',
+            'img_path'      => 'nullable|image|mimes:png,jpg,jpeg,webp|max:10000',
         ]);
 
         if ($request->hasFile('img_path')) {
@@ -123,14 +123,13 @@ class AssetController extends Controller
     public function update(Request $request, Asset $asset)
     {
         $validated = $request->validate([
-            'name'          => 'required|string|max:255',
-            'asset_code'    => 'required|string|unique:assets,asset_code,' . $asset->id . '|max:100',
+            'mode_name'          => 'required|unique:assets,model_name|string|max:255',
             'category_id'   => 'required|exists:categories,id',
             'brand'         => 'nullable|string|max:255',
             'purchase_date' => 'nullable|date',
             'condition'     => 'required|in:new,good,damaged',
-            'status'        => 'required|in:available,assigned,under_maintenance',
-            'img_path'      => 'nullable|image|max:2048',
+            'status'        => 'required|in:available,not_available,under_maintenance',
+            'img_path'      => 'nullable|image|mime:png,jpg,jpeg,webp|max:10000',
         ]);
 
         if ($request->hasFile('img_path')) {

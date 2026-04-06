@@ -21,6 +21,8 @@ class CategorySeeder extends Seeder
         Category::create(['name'=>'Printers']);
         Category::create(['name'=>'Scanner']);
         Category::create(['name'=>'Other']);
+        Category::create(['name'=>'Laptop']);
+        Category::create(['name'=>'CPU']);
         Category::create(['name'=>'Software']);
 
     }

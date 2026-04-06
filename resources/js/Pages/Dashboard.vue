@@ -120,8 +120,8 @@ const categoryData = computed(() => {
                                     <div class="flex-1 min-w-0">
                                         <p class="text-sm font-medium text-gray-900 truncate">{{ req.user?.name }}</p>
                                         <p class="text-xs text-gray-500 truncate">
-                                            Requested: <span class="font-medium text-gray-700">{{ req.asset?.name }}</span>
-                                            <span class="ml-1 text-gray-400">({{ req.asset?.asset_code }})</span>
+                                            Requested: <span class="font-medium text-gray-700">{{ req.asset?.model_name }}</span>
+                                            <span class="ml-1 text-gray-400">{{ req.asset?.reason }}</span>
                                         </p>
                                     </div>
                                     <div class="flex gap-2 shrink-0">
@@ -189,8 +189,7 @@ const categoryData = computed(() => {
                                 <tbody class="divide-y divide-gray-50">
                                     <tr v-for="a in recentAssignments" :key="a.id" class="hover:bg-gray-50 transition-colors">
                                         <td class="px-6 py-3">
-                                            <p class="font-medium text-gray-900">{{ a.asset?.name }}</p>
-                                            <p class="text-xs text-gray-400 font-mono">{{ a.asset?.asset_code }}</p>
+                                            <p class="font-medium text-gray-900">{{ a.asset?.model_name }}</p>
                                         </td>
                                         <td class="px-6 py-3 text-gray-700">{{ a.user?.name }}</td>
                                         <td class="px-6 py-3 text-gray-500 text-xs">{{ new Date(a.assigned_date).toLocaleDateString() }}</td>

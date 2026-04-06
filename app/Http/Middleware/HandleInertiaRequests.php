@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\AssetRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -33,8 +35,18 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
+                'roles' => $request->user()?->getRoleNames() ?? [],
             ],
             'isAdmin' => $request->user()?->hasRole('admin'),
+            'flash' => [
+                'success' => session('success'),
+                'error' => session('error'),
+            ],
+            'pending_requests_count' => Auth::check()
+    ? AssetRequest::where('status', 'pending')->count()
+    : 0,
+            'unread_notifications_count' => Auth::user()?->unreadNotifications()->count() ?? 0,
+            'recent_notifications' => Auth::user()?->notifications()->take(5)->get() ?? [],
         ];
     }
 }

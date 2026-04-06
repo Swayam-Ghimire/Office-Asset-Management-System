@@ -18,8 +18,9 @@ return new class extends Migration
             $table->string('brand')->nullable();
             $table->date('purchase_date')->nullable();
             $table->string('condition')->default('new'); // good, damaged
-            $table->string('status')->default('available'); // not available,
+            $table->string('status')->default('available'); // not available, under_maintenance
             $table->string('img_path')->nullable();
+            // $table->integer('quantity')->default(1);
             $table->timestamps();
         });
     }

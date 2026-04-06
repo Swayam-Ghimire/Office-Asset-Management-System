@@ -6,17 +6,47 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 
-/* Import Font Awesome core */
+/* Font Awesome Core */
 import { library } from '@fortawesome/fontawesome-svg-core';
-
-/* Import the Vue component */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-/* Import specific icons you want to use */
-import { faUser, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+/* Import requested icons */
+import { 
+    faUser, 
+    faEnvelope, 
+    faLock, 
+    faCircleCheck, 
+    faCircleXmark, 
+    faBox, 
+    faTags, 
+    faScrewdriverWrench, 
+    faClipboardList, 
+    faClockRotateLeft, 
+    faLink, 
+    faUsers, 
+    faBuilding, 
+    faFileArrowUp,
+    faChartBar,
+    faPlusCircle,
+    faBell,
+    faChevronDown,
+    faChevronRight,
+    faBars,
+    faUserPen,
+    faArrowRightFromBracket,
+    faShieldHalved,
+    faTriangleExclamation
+} from '@fortawesome/free-solid-svg-icons';
 
-/* Add icons to the library */
-library.add(faUser, faEnvelope, faLock);
+/* Add all icons to the library */
+library.add(
+    faUser, faEnvelope, faLock, faCircleCheck, faCircleXmark, 
+    faBox, faTags, faScrewdriverWrench, faClipboardList, 
+    faClockRotateLeft, faLink, faUsers, faBuilding, 
+    faFileArrowUp, faChartBar, faPlusCircle, faBell, 
+    faChevronDown, faChevronRight, faBars, faUserPen, 
+    faArrowRightFromBracket, faShieldHalved, faTriangleExclamation
+);
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -31,6 +61,8 @@ createInertiaApp({
         return createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
+            // Registered globally as 'fa-icon' per your request
+            .component('fa-icon', FontAwesomeIcon)
             .mount(el);
     },
     progress: {

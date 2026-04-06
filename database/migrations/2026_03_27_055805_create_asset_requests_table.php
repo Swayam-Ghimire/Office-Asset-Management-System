@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('asset_requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->nullOnDelete();
-            $table->foreignId('asset_id')->constrained()->nullOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('asset_id')->nullable()->constrained()->nullOnDelete();
             $table->string('status')->default('pending'); // approved, rejected
             $table->timestamp('requested_at')->useCurrent();
+            $table->longText('reason')->nullable();
             $table->string('approved_by')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();

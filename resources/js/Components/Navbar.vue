@@ -1,6 +1,6 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import { Head, Link } from "@inertiajs/vue3";
+import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 
 defineProps({
     canLogin: Boolean,
@@ -10,8 +10,7 @@ defineProps({
 
 <template>
     <nav class="w-full bg-white dark:bg-black shadow-sm">
-        <div class="max-w-7xl mx-auto p-6 flex items-center justify-between">
-            
+        <div class="p-2 max-w mx-1 flex items-center justify-between">
             <!-- Logo -->
             <div class="text-xl font-bold text-gray-900 dark:text-white">
                 <ApplicationLogo />
@@ -35,7 +34,6 @@ defineProps({
                     Log in
                 </Link>
             </div>
-
         </div>
     </nav>
 </template>

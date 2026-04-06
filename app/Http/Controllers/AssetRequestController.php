@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
-use App\Models\AssetRequest;
 use App\Models\AssetAssignment;
 use App\Models\AssetLog;
+use App\Models\AssetRequest;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class AssetRequestController extends Controller
@@ -21,7 +23,7 @@ class AssetRequestController extends Controller
 
         $query = AssetRequest::with(['asset.category', 'user']);
 
-        if (!$user->hasRole('admin')) {
+        if (! $user->hasRole('admin')) {
             $query->where('user_id', $user->id);
         }
 
@@ -33,8 +35,8 @@ class AssetRequestController extends Controller
 
         return Inertia::render('AssetRequests/Index', [
             'requests' => $requests,
-            'filters'  => $request->only(['status']),
-            'isAdmin'  => $user->hasRole('admin'),
+            'filters' => $request->only(['status']),
+            'isAdmin' => $user->hasRole('admin'),
         ]);
     }
 
@@ -43,11 +45,20 @@ class AssetRequestController extends Controller
      */
     public function create(Request $request)
     {
-        // Only available assets can be requested
-        $assets = Asset::where('status', 'available')->with('category')->get();
+        $assets = Asset::where('status', 'available')
+            ->with('category')
+            ->get();
+
+        $selected = $request->filled('asset_id') ? Asset::with('category')->find($request->asset_id) : null;
+
+        // // Pre-select if ?asset_id= was passed (from Home.vue Request button)
+        // $preselected = $request->filled('asset_id')
+        //     ? Asset::with('category')->find($request->asset_id)
+        //     : null;
 
         return Inertia::render('AssetRequests/Create', [
             'assets' => $assets,
+            'selected' => $selected,
         ]);
     }
 
@@ -58,33 +69,37 @@ class AssetRequestController extends Controller
     {
         $validated = $request->validate([
             'asset_id' => 'required|exists:assets,id',
+            'reason' => 'nullable|string|max:255',
         ]);
-
-        $asset = Asset::findOrFail($validated['asset_id']);
-
-        // Edge case: asset no longer available
-        if ($asset->status !== 'available') {
-            return back()->with('error', 'This asset is no longer available.');
-        }
-
         // Prevent duplicate pending request for same asset
-        $duplicate = AssetRequest::where('user_id', Auth::id())
-            ->where('asset_id', $asset->id)
+        $duplicate = AssetRequest::where('asset_id', $validated['asset_id'])
             ->where('status', 'pending')
             ->exists();
-
         if ($duplicate) {
-            return back()->with('error', 'You already have a pending request for this asset.');
+            return back()->with('error', 'This asset is currently unavailable.');
         }
+        try{
+            return DB::transaction(function () use ($validated) {
+                $updated = Asset::where('id', $validated['asset_id'])->where('status', 'available')->update(['status' => 'not_available']);
 
-        AssetRequest::create([
-            'user_id'      => Auth::id(),
-            'asset_id'     => $asset->id,
-            'status'       => 'pending',
-            'requested_at' => now(),
-        ]);
-
-        return redirect()->route('asset-requests.index')->with('success', 'Request submitted successfully.');
+                if (!$updated) {
+                    throw new Exception('This asset was just taken by someone else.');
+                }
+            // create a new request record
+                AssetRequest::create([
+                    'user_id' => Auth::id(),
+                    'asset_id' => $validated['asset_id'],
+                    'reason' => $validated['reason'],
+                    'status' => 'pending',
+                    'requested_at' => now(),
+                ]);
+    
+                return redirect()->route('asset-requests.index')->with('success', 'Request submitted successfully.');
+            });
+        }
+        catch(Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     /**
@@ -93,39 +108,39 @@ class AssetRequestController extends Controller
     public function approve(AssetRequest $assetRequest)
     {
         if ($assetRequest->status !== 'pending') {
-            return back()->with('error', 'Only pending requests can be approved.');
+            return redirect()->route('asset-requests.index')->with('error', 'Only pending requests can be approved.');
         }
 
         $asset = $assetRequest->asset;
 
-        if ($asset->status !== 'available') {
-            return back()->with('error', 'Asset is no longer available.');
+        if (!in_array($asset->status, ['available', 'not_available'], true)) {
+            return redirect()->route('asset-requests.index')->with('error', 'Asset is no longer assignable.');
         }
 
         // Update request
         $assetRequest->update([
-            'status'      => 'approved',
+            'status' => 'approved',
             'approved_by' => Auth::id(),
             'approved_at' => now(),
         ]);
 
         // Create assignment
         AssetAssignment::create([
-            'asset_id'      => $asset->id,
-            'user_id'       => $assetRequest->user_id,
+            'asset_id' => $asset->id,
+            'user_id' => $assetRequest->user_id,
             'assigned_date' => now(),
-            'status'        => 'assigned',
+            'status' => 'assigned',
         ]);
 
         // Update asset status
-        $asset->update(['status' => 'assigned']);
+        // $asset->update(['status' => 'assigned']);
 
         // Log
         AssetLog::create([
             'asset_id' => $asset->id,
-            'user_id'  => Auth::id(),
-            'action'   => 'approved',
-            'remarks'  => 'Request approved and asset assigned to user #' . $assetRequest->user_id,
+            'user_id' => Auth::id(),
+            'action' => 'approved',
+            'remarks' => 'Request approved and asset assigned to user'.$assetRequest->user_id,
         ]);
 
         return back()->with('success', 'Request approved and asset assigned.');
@@ -140,17 +155,23 @@ class AssetRequestController extends Controller
             return back()->with('error', 'Only pending requests can be rejected.');
         }
 
+        $asset = $assetRequest->asset;
+
         $assetRequest->update([
-            'status'      => 'rejected',
+            'status' => 'rejected',
             'approved_by' => Auth::id(),
             'approved_at' => now(),
         ]);
 
+        if ($asset && $asset->status === 'not_available') {
+            $asset->update(['status' => 'available']);
+        }
+
         AssetLog::create([
             'asset_id' => $assetRequest->asset_id,
-            'user_id'  => Auth::id(),
-            'action'   => 'rejected',
-            'remarks'  => 'Request rejected by admin',
+            'user_id' => Auth::id(),
+            'action' => 'rejected',
+            'remarks' => 'Request rejected by admin',
         ]);
 
         return back()->with('success', 'Request rejected.');

@@ -1,72 +1,143 @@
 <script setup>
-import { ref } from 'vue';
-import { Head, Link, router } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { ref } from "vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Modal from "../../Components/Modal.vue";
 
 const props = defineProps({
-    requests: Object,   // paginated
-    filters:  Object,
-    isAdmin:  Boolean,
+    requests: Object, // paginated
+    filters: Object,
+    isAdmin: Boolean,
 });
 
-const selectedStatus = ref(props.filters?.status ?? '');
+const selectedStatus = ref(props.filters?.status ?? "");
 
+// Approve asset modal
+const showApproveModal = ref(false);
+
+// Reject asset modal
+const showRejectionModal = ref(false);
+
+// Hold current request
+
+const selectedRequest = ref(null);
 function applyFilter() {
-    router.get(route('asset-requests.index'), { status: selectedStatus.value }, {
-        preserveScroll: true, replace: true,
-    });
+    router.get(
+        route("asset-requests.index"),
+        { status: selectedStatus.value },
+        {
+            preserveScroll: true,
+            replace: true,
+        },
+    );
 }
 
 function resetFilter() {
-    selectedStatus.value = '';
-    router.get(route('asset-requests.index'));
+    selectedStatus.value = "";
+    router.get(route("asset-requests.index"));
+}
+
+function confirmApproval(request) {
+    showApproveModal.value = true;
+    selectedRequest.value = request;
+}
+
+function confirmRejection(request) {
+    showRejectionModal.value = true;
+    selectedRequest.value = request;
 }
 
 function approve(id) {
-    router.put(route('asset-requests.approve', id), {}, { preserveScroll: true });
+    router.put(
+        route("asset-requests.approve", id),
+        {},
+        { preserveScroll: true },
+    );
+    selectedRequest.value = null;
+    showApproveModal.value = false;
 }
 
 function reject(id) {
-    if (confirm('Reject this request?')) {
-        router.put(route('asset-requests.reject', id), {}, { preserveScroll: true });
-    }
+    router.put(
+        route("asset-requests.reject", id),
+        {},
+        { preserveScroll: true },
+    );
+    selectedRequest.value = null;
+    showApproveModal.value = false;
 }
 
 const statusStyle = {
-    pending:  { pill: 'bg-amber-100 text-amber-700 border border-amber-200',  dot: 'bg-amber-400' },
-    approved: { pill: 'bg-emerald-100 text-emerald-700 border border-emerald-200', dot: 'bg-emerald-400' },
-    rejected: { pill: 'bg-rose-100 text-rose-700 border border-rose-200',     dot: 'bg-rose-400' },
+    pending: {
+        pill: "bg-amber-100 text-amber-700 border border-amber-200",
+        dot: "bg-amber-400",
+    },
+    approved: {
+        pill: "bg-emerald-100 text-emerald-700 border border-emerald-200",
+        dot: "bg-emerald-400",
+    },
+    rejected: {
+        pill: "bg-rose-100 text-rose-700 border border-rose-200",
+        dot: "bg-rose-400",
+    },
 };
 
 const categoryIcon = (name) => {
-    if (!name) return '📦';
+    if (!name) return "package";
     const n = name.toLowerCase();
-    if (n.includes('laptop'))   return '💻';
-    if (n.includes('monitor'))  return '🖥️';
-    if (n.includes('mouse'))    return '🖱️';
-    if (n.includes('keyboard')) return '⌨️';
-    if (n.includes('chair'))    return '🪑';
-    if (n.includes('phone'))    return '📱';
-    return '📦';
+    if (n.includes("laptop")) return "laptop";
+    if (n.includes("monitor")) return "desktop";
+    if (n.includes("mouse")) return "mouse";
+    if (n.includes("keyboard")) return "keyboard";
+    if (n.includes("chair")) return "chair";
+    if (n.includes("phone")) return "phone";
+    if (n.includes("tablet")) return "tablet";
+    return "package";
+};
+
+const categoryIconPath = (name) => {
+    const icon = categoryIcon(name);
+    const paths = {
+        laptop: "M3.75 6.75A2.25 2.25 0 016 4.5h12a2.25 2.25 0 012.25 2.25v8.25H3.75V6.75z M2.25 17.25h19.5",
+        desktop: "M3.75 5.25h16.5v10.5H3.75V5.25z M9 19.5h6 M12 15.75v3.75",
+        mouse: "M12 3.75a4.5 4.5 0 00-4.5 4.5v3.75a4.5 4.5 0 009 0V8.25A4.5 4.5 0 0012 3.75z M12 3.75V7.5",
+        keyboard:
+            "M3.75 6.75h16.5v10.5H3.75V6.75z M6.75 10.5h.008v.008H6.75V10.5z M9.75 10.5h.008v.008H9.75V10.5z M12.75 10.5h.008v.008h-.008V10.5z M15.75 10.5h.008v.008h-.008V10.5z M6.75 13.5h10.5",
+        chair: "M8.25 12.75h7.5V9a3.75 3.75 0 10-7.5 0v3.75z M8.25 12.75V18 M15.75 12.75V18 M6.75 18h10.5",
+        phone: "M9 3.75h6A2.25 2.25 0 0117.25 6v12A2.25 2.25 0 0115 20.25H9A2.25 2.25 0 016.75 18V6A2.25 2.25 0 019 3.75z M11.25 17.25h1.5",
+        tablet: "M7.5 3.75h9A2.25 2.25 0 0118.75 6v12A2.25 2.25 0 0116.5 20.25h-9A2.25 2.25 0 015.25 18V6A2.25 2.25 0 017.5 3.75z M11.25 17.25h1.5",
+        package:
+            "M20.25 7.5L12 12m0 0L3.75 7.5M12 12v9m8.25-13.5v9L12 21l-8.25-4.5v-9L12 3l8.25 4.5z",
+    };
+
+    return paths[icon] ?? paths.package;
 };
 
 function fmt(date) {
-    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return new Date(date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+    });
 }
 </script>
 
 <template>
     <Head title="Asset Requests" />
 
-    <AuthenticatedLayout>
+    <AuthenticatedLayout page-title="Asset Request">
         <template #header>
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900 tracking-tight">
-                        {{ isAdmin ? 'All Asset Requests' : 'My Requests' }}
+                        {{ isAdmin ? "All Asset Requests" : "My Requests" }}
                     </h1>
                     <p class="text-sm text-gray-500 mt-0.5">
-                        {{ isAdmin ? 'Review and manage employee asset requests' : 'Track the status of your asset requests' }}
+                        {{
+                            isAdmin
+                                ? "Review and manage employee asset requests"
+                                : "Track the status of your asset requests"
+                        }}
                     </p>
                 </div>
                 <Link
@@ -74,8 +145,18 @@ function fmt(date) {
                     :href="route('asset-requests.create')"
                     class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
                 >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 4v16m8-8H4"
+                        />
                     </svg>
                     New Request
                 </Link>
@@ -84,61 +165,132 @@ function fmt(date) {
 
         <div class="py-8">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
-
                 <!-- Flash messages -->
-                <div v-if="$page.props.flash?.success"
-                    class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3 rounded-xl">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                <div
+                    v-if="$page.props.flash?.success"
+                    class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3 rounded-xl"
+                >
+                    <svg
+                        class="w-4 h-4 shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                        />
                     </svg>
                     {{ $page.props.flash.success }}
                 </div>
-                <div v-if="$page.props.flash?.error"
-                    class="flex items-center gap-3 bg-rose-50 border border-rose-200 text-rose-800 text-sm px-4 py-3 rounded-xl">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <div
+                    v-if="$page.props.flash?.error"
+                    class="flex items-center gap-3 bg-rose-50 border border-rose-200 text-rose-800 text-sm px-4 py-3 rounded-xl"
+                >
+                    <svg
+                        class="w-4 h-4 shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                        />
                     </svg>
                     {{ $page.props.flash.error }}
                 </div>
 
                 <!-- Filter bar -->
-                <div class="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex flex-wrap items-end gap-3">
+                <div
+                    class="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex flex-wrap items-end gap-3"
+                >
                     <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Filter by Status</label>
+                        <label
+                            class="block text-xs font-medium text-gray-500 mb-1"
+                            >Filter by Status</label
+                        >
                         <div class="flex gap-2">
                             <button
-                                v-for="opt in ['', 'pending', 'approved', 'rejected']"
+                                v-for="opt in [
+                                    '',
+                                    'pending',
+                                    'approved',
+                                    'rejected',
+                                ]"
                                 :key="opt"
-                                @click="selectedStatus = opt; applyFilter()"
+                                @click="
+                                    selectedStatus = opt;
+                                    applyFilter();
+                                "
                                 :class="[
                                     'px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors',
                                     selectedStatus === opt
                                         ? 'bg-red-600 text-white border-red-600'
-                                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300',
                                 ]"
                             >
-                                {{ opt === '' ? 'All' : opt.charAt(0).toUpperCase() + opt.slice(1) }}
+                                {{
+                                    opt === ""
+                                        ? "All"
+                                        : opt.charAt(0).toUpperCase() +
+                                          opt.slice(1)
+                                }}
                             </button>
                         </div>
                     </div>
                     <div v-if="selectedStatus" class="ml-auto">
-                        <button @click="resetFilter" class="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                        <button
+                            @click="resetFilter"
+                            class="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                        >
                             Clear filter ✕
                         </button>
                     </div>
                 </div>
 
                 <!-- Table -->
-                <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                    <div v-if="requests.data.length > 0" class="overflow-x-auto">
+                <div
+                    class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden"
+                >
+                    <div
+                        v-if="requests.data.length > 0"
+                        class="overflow-x-auto"
+                    >
                         <table class="w-full text-sm">
                             <thead>
                                 <tr class="border-b border-gray-100 bg-gray-50">
-                                    <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Asset</th>
-                                    <th v-if="isAdmin" class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Requested By</th>
-                                    <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</th>
-                                    <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
-                                    <th v-if="isAdmin" class="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Action</th>
+                                    <th
+                                        class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                    >
+                                        Asset
+                                    </th>
+                                    <th
+                                        v-if="isAdmin"
+                                        class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                    >
+                                        Requested By
+                                    </th>
+                                    <th
+                                        class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                    >
+                                        Date
+                                    </th>
+                                    <th
+                                        class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                    >
+                                        Status
+                                    </th>
+                                    <th
+                                        v-if="isAdmin"
+                                        class="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                    >
+                                        Action
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50">
@@ -150,12 +302,42 @@ function fmt(date) {
                                     <!-- Asset -->
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-lg shrink-0">
-                                                {{ categoryIcon(req.asset?.category?.name) }}
+                                            <div
+                                                class="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-lg shrink-0"
+                                            >
+                                                <svg
+                                                    class="w-5 h-5 text-blue-700"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        :d="
+                                                            categoryIconPath(
+                                                                req.asset.category?.name,
+                                                            )
+                                                        "
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="1.8"
+                                                    />
+                                                </svg>
                                             </div>
                                             <div>
-                                                <p class="font-semibold text-gray-900">{{ req.asset?.model_name }}</p>
-                                                <p class="text-xs text-gray-400">{{ req.asset?.category?.name ?? 'Uncategorized' }}</p>
+                                                <p
+                                                    class="font-semibold text-gray-900"
+                                                >
+                                                    {{ req.asset?.model_name }}
+                                                </p>
+                                                <p
+                                                    class="text-xs text-gray-400"
+                                                >
+                                                    {{
+                                                        req.asset?.category
+                                                            ?.name ??
+                                                        "Uncategorized"
+                                                    }}
+                                                </p>
                                             </div>
                                         </div>
                                     </td>
@@ -168,50 +350,116 @@ function fmt(date) {
                                                 class="w-7 h-7 rounded-full"
                                             />
                                             <div>
-                                                <p class="text-sm font-medium text-gray-900">{{ req.user?.name }}</p>
-                                                <p class="text-xs text-gray-400">{{ req.user?.email }}</p>
+                                                <p
+                                                    class="text-sm font-medium text-gray-900"
+                                                >
+                                                    {{ req.user?.name }}
+                                                </p>
+                                                <p
+                                                    class="text-xs text-gray-400"
+                                                >
+                                                    {{ req.user?.email }}
+                                                </p>
                                             </div>
                                         </div>
                                     </td>
 
                                     <!-- Date -->
-                                    <td class="px-6 py-4 text-gray-500 text-xs whitespace-nowrap">
+                                    <td
+                                        class="px-6 py-4 text-gray-500 text-xs whitespace-nowrap"
+                                    >
                                         {{ fmt(req.requested_at) }}
                                     </td>
 
                                     <!-- Status -->
                                     <td class="px-6 py-4">
-                                        <span :class="['inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium', statusStyle[req.status]?.pill ?? 'bg-gray-100 text-gray-600']">
-                                            <span :class="['w-1.5 h-1.5 rounded-full', statusStyle[req.status]?.dot ?? 'bg-gray-400']"></span>
-                                            {{ req.status.charAt(0).toUpperCase() + req.status.slice(1) }}
+                                        <span
+                                            :class="[
+                                                'inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium',
+                                                statusStyle[req.status]?.pill ??
+                                                    'bg-gray-100 text-gray-600',
+                                            ]"
+                                        >
+                                            <span
+                                                :class="[
+                                                    'w-1.5 h-1.5 rounded-full',
+                                                    statusStyle[req.status]
+                                                        ?.dot ?? 'bg-gray-400',
+                                                ]"
+                                            ></span>
+                                            {{
+                                                req.status
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                req.status.slice(1)
+                                            }}
                                         </span>
                                     </td>
 
                                     <!-- Admin actions -->
-                                    <td v-if="$page.props.isAdmin" class="px-6 py-4 text-right">
-                                        <div v-if="req.status === 'pending'" class="flex justify-end gap-2">
+                                    <td
+                                        v-if="$page.props.isAdmin"
+                                        class="px-6 py-4 text-right"
+                                    >
+                                        <div
+                                            v-if="req.status === 'pending'"
+                                            class="flex justify-end gap-2"
+                                        >
                                             <button
-                                                @click="approve(req.id)"
+                                                @click="confirmApproval(req)"
                                                 class="inline-flex items-center gap-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg transition-colors font-medium"
                                             >
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                <svg
+                                                    class="w-3.5 h-3.5"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M5 13l4 4L19 7"
+                                                    />
                                                 </svg>
                                                 Approve
                                             </button>
                                             <button
-                                                @click="reject(req.id)"
+                                                @click="confirmRejection(req)"
                                                 class="inline-flex items-center gap-1 text-xs border border-rose-200 text-rose-600 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-colors font-medium"
                                             >
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                <svg
+                                                    class="w-3.5 h-3.5"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M6 18L18 6M6 6l12 12"
+                                                    />
                                                 </svg>
                                                 Reject
                                             </button>
                                         </div>
-                                        <span v-else class="text-xs text-gray-400 italic">
-                                            {{ req.status === 'approved' ? 'Approved' : 'Rejected' }}
-                                            <span v-if="req.approved_at" class="block text-gray-300">{{ fmt(req.approved_at) }}</span>
+                                        <span
+                                            v-else
+                                            class="text-xs text-gray-400 italic"
+                                        >
+                                            {{
+                                                req.status === "approved"
+                                                    ? "Approved"
+                                                    : "Rejected"
+                                            }}
+                                            <span
+                                                v-if="req.approved_at"
+                                                class="block text-gray-300"
+                                                >{{
+                                                    fmt(req.approved_at)
+                                                }}</span
+                                            >
                                         </span>
                                     </td>
                                 </tr>
@@ -222,9 +470,17 @@ function fmt(date) {
                     <!-- Empty state -->
                     <div v-else class="px-6 py-16 text-center">
                         <div class="text-5xl mb-4">📋</div>
-                        <p class="text-sm font-semibold text-gray-600 mb-1">No requests found</p>
+                        <p class="text-sm font-semibold text-gray-600 mb-1">
+                            No requests found
+                        </p>
                         <p class="text-xs text-gray-400 mb-4">
-                            {{ selectedStatus ? 'Try a different status filter' : (isAdmin ? 'No requests have been submitted yet' : "You haven't made any requests yet") }}
+                            {{
+                                selectedStatus
+                                    ? "Try a different status filter"
+                                    : isAdmin
+                                      ? "No requests have been submitted yet"
+                                      : "You haven't made any requests yet"
+                            }}
                         </p>
                         <Link
                             v-if="!isAdmin"
@@ -237,7 +493,10 @@ function fmt(date) {
                 </div>
 
                 <!-- Pagination -->
-                <div v-if="requests.last_page > 1" class="flex justify-center gap-1">
+                <div
+                    v-if="requests.last_page > 1"
+                    class="flex justify-center gap-1"
+                >
                     <template v-for="link in requests.links" :key="link.label">
                         <Link
                             v-if="link.url"
@@ -247,7 +506,7 @@ function fmt(date) {
                                 'px-3 py-1.5 rounded-lg text-sm border transition-colors',
                                 link.active
                                     ? 'bg-red-600 text-white border-red-600'
-                                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300',
                             ]"
                         />
                         <span
@@ -257,8 +516,122 @@ function fmt(date) {
                         />
                     </template>
                 </div>
-
             </div>
         </div>
+        <!-- Approval Modal -->
+        <Modal :show="showApproveModal" @close="showApproveModal = false">
+            <div class="p-6">
+                <!-- Header with Icon -->
+                <div class="flex items-center gap-3 mb-4">
+                    <!-- Green Circle for Approval -->
+                    <div
+                        class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0"
+                    >
+                        <fa-icon
+                            :icon="['fas', 'check-circle']"
+                            class="text-emerald-600 text-lg"
+                        />
+                    </div>
+                    <div>
+                        <h3 class="text-base font-semibold text-gray-900">
+                            Approve Request
+                        </h3>
+                        <p class="text-sm text-gray-500">
+                            Confirming this approval.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Content Body -->
+                <p class="text-sm text-gray-700 mb-6">
+                    Are you sure you want to approve the request for
+                    <span class="font-semibold">{{
+                        selectedRequest?.asset?.model_name ??
+                        selectedRequest?.asset?.name
+                    }}</span
+                    >? This will assign the asset to
+                    <span class="font-semibold text-gray-900">{{
+                        selectedRequest?.user?.name
+                    }}</span
+                    >.
+                </p>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end gap-3">
+                    <button
+                        @click="showApproveModal = false"
+                        type="button"
+                        class="px-4 py-2 text-sm border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        @click="approve(selectedRequest.id)"
+                        type="button"
+                        class="px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors font-medium"
+                    >
+                        Confirm Approval
+                    </button>
+                </div>
+            </div>
+        </Modal>
+
+        <!-- Rejection Modal -->
+
+        <Modal :show="showRejectionModal" @close="showRejectionModal = false">
+            <div class="p-6">
+                <!-- Header with Icon -->
+                <div class="flex items-center gap-3 mb-4">
+                    <!-- icon -->
+                    <div
+                        class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0"
+                    >
+                        <fa-icon
+                            :icon="['fas', 'circle-xmark']"
+                            class="text-red-600 text-lg"
+                        />
+                    </div>
+                    <div>
+                        <h3 class="text-base font-semibold text-gray-900">
+                            Reject Request
+                        </h3>
+                        <p class="text-sm text-gray-500">
+                            Confirming this rejection.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Content Body -->
+                <p class="text-sm text-gray-700 mb-6">
+                    Are you sure you want to reject the request for
+                    <span class="font-semibold">{{
+                        selectedRequest?.asset?.model_name
+                    }}</span
+                    >? This will reject the asset to
+                    <span class="font-semibold text-gray-900">{{
+                        selectedRequest?.user?.name
+                    }}</span
+                    >.
+                </p>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end gap-3">
+                    <button
+                        @click="showRejectionModal = false"
+                        type="button"
+                        class="px-4 py-2 text-sm border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        @click="reject(selectedRequest.id)"
+                        type="button"
+                        class="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium"
+                    >
+                        Confirm Rejection
+                    </button>
+                </div>
+            </div>
+        </Modal>
     </AuthenticatedLayout>
 </template>

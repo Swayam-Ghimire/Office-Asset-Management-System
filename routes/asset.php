@@ -4,7 +4,6 @@ use App\Http\Controllers\AssetAssignmentController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\AssetRequestController;
 use App\Http\Controllers\MaintenanceController;
-use App\Models\AssetRequest;
 use Illuminate\Support\Facades\Route;
 
 // Asset Routes
@@ -30,10 +29,15 @@ GET /requests/my → View my requests
 
 GET /requests/{id} → View request details
     */
-    Route::get('/requests/my', 'index')->name('asset-requests.index');
+    Route::get('/requests', 'index')->name('asset-requests.index');
     Route::get('/requests/create', 'create')->name('asset-requests.create');
     Route::get('/requests/{id}', 'show')->name('asset-requests.show');
     Route::post('/requests', 'store')->name('asset-requests.store');
+});
+
+Route::controller(AssetRequestController::class)->middleware(['auth', 'role:admin'])->group(function () {
+    Route::put('/requests/{assetRequest}/approve', 'approve')->name('asset-requests.approve');
+    Route::put('/requests/{assetRequest}/reject', 'reject')->name('asset-requests.reject');
 });
 
 // Asset Assignments
@@ -43,8 +47,6 @@ Route::controller(AssetAssignmentController::class)->middleware('auth')->group(f
 });
 
 // Maintenance Management
-
-
 Route::controller(MaintenanceController::class)->prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('/maintenance', 'index')->name('maintenance.index');
     Route::get('/maintenance/{id}', 'show')->name('maintenance.show');

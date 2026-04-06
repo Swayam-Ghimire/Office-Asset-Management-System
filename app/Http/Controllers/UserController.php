@@ -100,7 +100,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,'.$user->id,
             'department_id' => 'nullable|exists:departments,id',
             'role' => 'required|in:admin,employee',
-            'status' => 'required|in:active,inactive',
+            'status' => 'sometimes|integer',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
@@ -123,7 +123,7 @@ class UserController extends Controller
     public function toggleStatus(User $user)
     {
         $user->update([
-            'status' => $user->status === 'active' ? 'inactive' : 'active',
+            'status' => $user->status === 1 ? 0 : 1,
         ]);
 
         return back()->with('success', 'User status updated.');
@@ -145,6 +145,6 @@ class UserController extends Controller
             $user->delete();
         }
 
-        return back()->with('success', 'User Deleted');
+        return redirect()->route('users.index')->with('success', 'User Deleted');
     }
 }

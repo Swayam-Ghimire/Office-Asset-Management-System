@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\MaintenanceController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,3 +19,13 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'role:admin'])->controll
     Route::delete('/users/{user}', 'destroy')->name('users.destroy');
     Route::post('/users/{user}/toggle', 'toggleStatus')->name('users.update-status');
 });
+
+// Notifications
+Route::post('/notifications/{id}/read',   [NotificationController::class, 'markRead'])->name('notifications.read');
+Route::post('/notifications/read-all',    [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
+Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
+
+// New pages (admin)
+Route::get('/admin/categories',  [CategoryController::class, 'index'])->name('categories.index');
+Route::get('/admin/departments', [DepartmentController::class, 'index'])->name('departments.index');
+Route::get('/admin/maintenance', [MaintenanceController::class, 'index'])->name('maintenance.index');
