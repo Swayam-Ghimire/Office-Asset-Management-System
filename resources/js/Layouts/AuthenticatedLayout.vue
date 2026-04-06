@@ -1,12 +1,14 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import Sidebar from '@/Components/Navigation/Sidebar.vue';
 import TopBar  from '@/Components/Navigation/TopBar.vue';
-import Footer  from '@/Components/Footer.vue';
+import { useFlash } from '@/Composables/useFlash.js';
 
 defineProps({
     pageTitle: { type: String, default: '' },
 });
+
+useFlash();
 
 const sidebarOpen = ref(false);
 </script>

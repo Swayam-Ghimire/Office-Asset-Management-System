@@ -30,9 +30,9 @@ GET /requests/my → View my requests
 GET /requests/{id} → View request details
     */
     Route::get('/requests', 'index')->name('asset-requests.index');
-    Route::get('/requests/create', 'create')->name('asset-requests.create');
+    Route::get('/requests/create', 'create')->name('asset-requests.create')->middleware('role:employee');
     Route::get('/requests/{id}', 'show')->name('asset-requests.show');
-    Route::post('/requests', 'store')->name('asset-requests.store');
+    Route::post('/requests', 'store')->name('asset-requests.store')->middleware('role:employee');
 });
 
 Route::controller(AssetRequestController::class)->middleware(['auth', 'role:admin'])->group(function () {

@@ -64,7 +64,7 @@ function reject(id) {
         { preserveScroll: true },
     );
     selectedRequest.value = null;
-    showApproveModal.value = false;
+    showRejectionModal.value = false;
 }
 
 const statusStyle = {
@@ -166,7 +166,7 @@ function fmt(date) {
         <div class="py-8">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
                 <!-- Flash messages -->
-                <div
+                <!-- <div
                     v-if="$page.props.flash?.success"
                     class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3 rounded-xl"
                 >
@@ -203,7 +203,7 @@ function fmt(date) {
                         />
                     </svg>
                     {{ $page.props.flash.error }}
-                </div>
+                </div> -->
 
                 <!-- Filter bar -->
                 <div

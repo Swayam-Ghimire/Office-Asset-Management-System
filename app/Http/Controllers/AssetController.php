@@ -71,8 +71,8 @@ class AssetController extends Controller
         $validated = $request->validate([
             'model_name'          => 'required|string|unique:assets,model_name|max:255',
             'category_id'   => 'required|exists:categories,id',
-            'brand'         => 'nullable|string|max:255',
-            'purchase_date' => 'nullable|date',
+            'brand'         => 'nullable|string|max:20',
+            'purchase_date' => 'required|date',
             'condition'     => 'required|in:new,good,damaged',
             'status'        => 'required|string',
             'img_path'      => 'nullable|image|mimes:png,jpg,jpeg,webp|max:10000',
@@ -91,8 +91,8 @@ class AssetController extends Controller
             'action'   => 'created',
             'remarks'  => 'Asset created by admin',
         ]);
-
-        return redirect()->route('assets.index')->with('success', 'Asset created successfully.');
+        flash_success('Asset Created Successfully');
+        return redirect()->route('assets.index');
     }
 
     public function show(Asset $asset)
@@ -123,7 +123,7 @@ class AssetController extends Controller
     public function update(Request $request, Asset $asset)
     {
         $validated = $request->validate([
-            'mode_name'          => 'required|unique:assets,model_name|string|max:255',
+            'model_name'          => 'required|unique:assets,model_name|string|max:255',
             'category_id'   => 'required|exists:categories,id',
             'brand'         => 'nullable|string|max:255',
             'purchase_date' => 'nullable|date',

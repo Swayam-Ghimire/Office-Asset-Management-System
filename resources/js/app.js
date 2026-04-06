@@ -38,6 +38,9 @@ import {
     faTriangleExclamation
 } from '@fortawesome/free-solid-svg-icons';
 
+import Vue3Toastify from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
 /* Add all icons to the library */
 library.add(
     faUser, faEnvelope, faLock, faCircleCheck, faCircleXmark, 
@@ -61,6 +64,14 @@ createInertiaApp({
         return createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
+            .use(Vue3Toastify, {
+                autoClose:        3000,
+                position:         'top-right',
+                theme:            'light',
+                clearOnUrlChange: false,   // keeps toast visible during Inertia navigation
+                pauseOnHover:     true,
+                closeOnClick:     true,
+            })
             // Registered globally as 'fa-icon' per your request
             .component('fa-icon', FontAwesomeIcon)
             .mount(el);
