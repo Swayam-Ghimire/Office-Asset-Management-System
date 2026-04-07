@@ -76,7 +76,8 @@ class AssetRequestController extends Controller
             ->where('status', 'pending')
             ->exists();
         if ($duplicate) {
-            return back()->with('error', 'This asset is currently unavailable.');
+            flash_error("This asset is already requested by someone. Please choose another or wait for it to become available.");
+            return back();
         }
         try{
             return DB::transaction(function () use ($validated) {
@@ -93,12 +94,13 @@ class AssetRequestController extends Controller
                     'status' => 'pending',
                     'requested_at' => now(),
                 ]);
-    
-                return redirect()->route('asset-requests.index')->with('success', 'Request submitted successfully.');
+                flash_success('Request submitted successfully.');
+                return redirect()->route('asset-requests.index');
             });
         }
         catch(Exception $e) {
-            return back()->with('error', $e->getMessage());
+            flash_error($e->getMessage());
+            return back();
         }
     }
 
@@ -108,13 +110,15 @@ class AssetRequestController extends Controller
     public function approve(AssetRequest $assetRequest)
     {
         if ($assetRequest->status !== 'pending') {
-            return redirect()->route('asset-requests.index')->with('error', 'Only pending requests can be approved.');
+            flash_error("Only pending requests can be approved.");
+            return redirect()->route('asset-requests.index');
         }
 
         $asset = $assetRequest->asset;
 
         if (!in_array($asset->status, ['available', 'not_available'], true)) {
-            return redirect()->route('asset-requests.index')->with('error', 'Asset is no longer assignable.');
+            flash_error("Asset is no longer assignable.");
+            return redirect()->route('asset-requests.index');
         }
 
         // Update request
@@ -142,8 +146,8 @@ class AssetRequestController extends Controller
             'action' => 'approved',
             'remarks' => 'Request approved and asset assigned to user'.$assetRequest->user_id,
         ]);
-
-        return back()->with('success', 'Request approved and asset assigned.');
+        flash_success("Request approved and asset assigned.");
+        return back();
     }
 
     /**
@@ -152,7 +156,8 @@ class AssetRequestController extends Controller
     public function reject(AssetRequest $assetRequest)
     {
         if ($assetRequest->status !== 'pending') {
-            return back()->with('error', 'Only pending requests can be rejected.');
+            flash_error("Only pending requests can be rejected.");
+            return back();
         }
 
         $asset = $assetRequest->asset;
@@ -173,7 +178,7 @@ class AssetRequestController extends Controller
             'action' => 'rejected',
             'remarks' => 'Request rejected by admin',
         ]);
-
-        return back()->with('success', 'Request rejected.');
+        flash_success("Request rejected.");
+        return back();
     }
 }

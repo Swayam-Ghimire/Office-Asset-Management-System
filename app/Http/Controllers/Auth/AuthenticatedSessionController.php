@@ -34,7 +34,8 @@ class AuthenticatedSessionController extends Controller
         // check if the user status is active or not
         if ($request->user()->status === 1) {
             $request->session()->regenerate();
-            return redirect()->route('home')->with('success', 'You are logged in!!');
+            flash_success('Logged in successfully.');
+            return redirect()->route('home');
         }
         else {
             Auth::guard('web')->logout();
@@ -43,7 +44,8 @@ class AuthenticatedSessionController extends Controller
 
             $request->session()->regenerateToken();
 
-            return redirect()->route('login')->withError(['email' => 'Your account is inactive. Please contact the administrator.'])->with('error', 'Your account is inactive please contact the administrator');
+            flash_error('Your account is inactive. Please contact the administrator.');
+            return redirect()->route('login');
         }
 
 
@@ -69,6 +71,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        flash_success('Logged out successfully.');
+        return redirect('/login');
     }
 }

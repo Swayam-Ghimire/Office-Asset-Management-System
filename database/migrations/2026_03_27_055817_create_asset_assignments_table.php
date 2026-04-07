@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('assigned_date')->useCurrent();
             $table->timestamp('return_date')->nullable();
             $table->string('status')->default('assigned'); // assigned, returned
+            $table->softDeletes();
             $table->timestamps();
         });
     }

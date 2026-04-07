@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('status')->default(0); // inactive
             $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
             $table->string('img_path')->nullable();
+            $table->softDeletes();
             $table->rememberToken();
             $table->timestamps();
         });

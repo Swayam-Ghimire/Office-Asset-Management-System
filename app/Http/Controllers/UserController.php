@@ -77,8 +77,8 @@ class UserController extends Controller
         Password::broker()->sendResetLink([
             'email' => $user->email
         ]);
-
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        flash_success('User created');
+        return redirect()->route('users.index');
     }
 
     public function edit(User $user)
@@ -117,7 +117,8 @@ class UserController extends Controller
 
         $user->syncRoles([$validated['role']]);
 
-        return redirect()->route('users.index')->with('success', 'User updated successfully.');
+        flash_success('User updated successfully.');
+        return redirect()->route('users.index');
     }
 
     public function toggleStatus(User $user)
@@ -125,8 +126,8 @@ class UserController extends Controller
         $user->update([
             'status' => $user->status === 1 ? 0 : 1,
         ]);
-
-        return back()->with('success', 'User status updated.');
+        flash_success('User status updated.');
+        return back();
     }
 
     public function show(User $user)

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->longText('reason')->nullable();
             $table->string('approved_by')->nullable();
             $table->timestamp('approved_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

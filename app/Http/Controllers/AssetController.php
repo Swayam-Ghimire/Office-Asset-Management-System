@@ -145,14 +145,16 @@ class AssetController extends Controller
             'remarks'  => 'Asset updated by admin',
         ]);
 
-        return redirect()->route('assets.index')->with('success', 'Asset updated successfully.');
+        flash_success("Asset updated");
+        return redirect()->route('assets.index');
     }
 
     public function destroy(Asset $asset)
     {
         // Prevent deletion if currently assigned
         if ($asset->status === 'assigned') {
-            return back()->with('error', 'Cannot delete an asset that is currently assigned.');
+            flash_error("Cannot delete asset that is currently assigned");
+            return back();
         }
 
         AssetLog::create([
@@ -164,6 +166,7 @@ class AssetController extends Controller
 
         $asset->delete();
 
-        return redirect()->route('assets.index')->with('success', 'Asset deleted successfully.');
+        flash_success("Asset Deleted");
+        return redirect()->route('assets.index');
     }
 }

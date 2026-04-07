@@ -49,7 +49,8 @@ class AssetAssignmentController extends Controller
         }
 
         if ($assetAssignment->status !== 'assigned') {
-            return back()->with('error', 'This asset has already been returned.');
+            flash_error('This asset has already been returned.');
+            return back();
         }
 
         $assetAssignment->update([
@@ -67,6 +68,7 @@ class AssetAssignmentController extends Controller
             'remarks'  => 'Asset returned by user #' . $assetAssignment->user_id,
         ]);
 
-        return back()->with('success', 'Asset returned successfully.');
+        flash_success('Asset returned successfully.');
+        return back();
     }
 }
