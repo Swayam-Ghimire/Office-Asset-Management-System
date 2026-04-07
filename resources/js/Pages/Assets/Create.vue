@@ -61,17 +61,7 @@ const submit = () => {
                                     :message="form.errors.model_name"
                                 />
                             </div>
-                            <!-- <div>
-                                <InputLabel
-                                    for="quantity"
-                                    value="Quantity"
-                                />
-                                <TextInput id="queantity" type="number" class="mt-1 block w-full" v-model="form.quantity" min="1" required />
-                                <InputError
-                                    class="mt-2"
-                                    :message="form.errors.quantity"
-                                />
-                            </div> -->
+
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

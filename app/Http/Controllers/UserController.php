@@ -102,6 +102,7 @@ class UserController extends Controller
             'role' => 'required|in:admin,employee',
             'status' => 'sometimes|integer',
             'password' => 'nullable|string|min:8|confirmed',
+            'img_path' => 'sometimes|nullable|image|max:2048',
         ]);
 
         $user->update([
@@ -145,7 +146,7 @@ class UserController extends Controller
         if ($request->user()->hasRole('admin')) {
             $user->delete();
         }
-
-        return redirect()->route('users.index')->with('success', 'User Deleted');
+        flash_success('User deleted successfully.');
+        return redirect()->route('users.index');
     }
 }

@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import Modal from "../../Components/Modal.vue";
+import ConfirmActionModal from "@/Components/Modals/ConfirmActionModal.vue";
 
 const props = defineProps({
     requests: Object, // paginated
@@ -165,46 +165,6 @@ function fmt(date) {
 
         <div class="py-8">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
-                <!-- Flash messages -->
-                <!-- <div
-                    v-if="$page.props.flash?.success"
-                    class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3 rounded-xl"
-                >
-                    <svg
-                        class="w-4 h-4 shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M5 13l4 4L19 7"
-                        />
-                    </svg>
-                    {{ $page.props.flash.success }}
-                </div>
-                <div
-                    v-if="$page.props.flash?.error"
-                    class="flex items-center gap-3 bg-rose-50 border border-rose-200 text-rose-800 text-sm px-4 py-3 rounded-xl"
-                >
-                    <svg
-                        class="w-4 h-4 shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
-                        />
-                    </svg>
-                    {{ $page.props.flash.error }}
-                </div> -->
-
                 <!-- Filter bar -->
                 <div
                     class="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex flex-wrap items-end gap-3"
@@ -314,7 +274,9 @@ function fmt(date) {
                                                     <path
                                                         :d="
                                                             categoryIconPath(
-                                                                req.asset.category?.name,
+                                                                req.asset
+                                                                    .category
+                                                                    ?.name,
                                                             )
                                                         "
                                                         stroke-linecap="round"
@@ -518,120 +480,50 @@ function fmt(date) {
                 </div>
             </div>
         </div>
-        <!-- Approval Modal -->
-        <Modal :show="showApproveModal" @close="showApproveModal = false">
-            <div class="p-6">
-                <!-- Header with Icon -->
-                <div class="flex items-center gap-3 mb-4">
-                    <!-- Green Circle for Approval -->
-                    <div
-                        class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0"
-                    >
-                        <fa-icon
-                            :icon="['fas', 'check-circle']"
-                            class="text-emerald-600 text-lg"
-                        />
-                    </div>
-                    <div>
-                        <h3 class="text-base font-semibold text-gray-900">
-                            Approve Request
-                        </h3>
-                        <p class="text-sm text-gray-500">
-                            Confirming this approval.
-                        </p>
-                    </div>
-                </div>
+        <!-- Modal -->
+        <ConfirmActionModal
+            :show="showApproveModal"
+            actionType="approve"
+            title="Approve Request"
+            subtitle="Confirming this approval."
+            confirmText="Confirm Approval"
+            @close="showApproveModal = false"
+            @confirm="approve(selectedRequest.id)"
+        >
+            <p v-if="selectedRequest">
+                Are you sure you want to approve the request for
+                <span class="font-semibold">{{
+                    selectedRequest.asset?.model_name ??
+                    selectedRequest.asset?.name
+                }}</span
+                >? This will assign the asset to
+                <span class="font-semibold text-gray-900">{{
+                    selectedRequest.user?.name
+                }}</span
+                >.
+            </p>
+        </ConfirmActionModal>
 
-                <!-- Content Body -->
-                <p class="text-sm text-gray-700 mb-6">
-                    Are you sure you want to approve the request for
-                    <span class="font-semibold">{{
-                        selectedRequest?.asset?.model_name ??
-                        selectedRequest?.asset?.name
-                    }}</span
-                    >? This will assign the asset to
-                    <span class="font-semibold text-gray-900">{{
-                        selectedRequest?.user?.name
-                    }}</span
-                    >.
-                </p>
-
-                <!-- Action Buttons -->
-                <div class="flex justify-end gap-3">
-                    <button
-                        @click="showApproveModal = false"
-                        type="button"
-                        class="px-4 py-2 text-sm border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        @click="approve(selectedRequest.id)"
-                        type="button"
-                        class="px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors font-medium"
-                    >
-                        Confirm Approval
-                    </button>
-                </div>
-            </div>
-        </Modal>
-
-        <!-- Rejection Modal -->
-
-        <Modal :show="showRejectionModal" @close="showRejectionModal = false">
-            <div class="p-6">
-                <!-- Header with Icon -->
-                <div class="flex items-center gap-3 mb-4">
-                    <!-- icon -->
-                    <div
-                        class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0"
-                    >
-                        <fa-icon
-                            :icon="['fas', 'circle-xmark']"
-                            class="text-red-600 text-lg"
-                        />
-                    </div>
-                    <div>
-                        <h3 class="text-base font-semibold text-gray-900">
-                            Reject Request
-                        </h3>
-                        <p class="text-sm text-gray-500">
-                            Confirming this rejection.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Content Body -->
-                <p class="text-sm text-gray-700 mb-6">
-                    Are you sure you want to reject the request for
-                    <span class="font-semibold">{{
-                        selectedRequest?.asset?.model_name
-                    }}</span
-                    >? This will reject the asset to
-                    <span class="font-semibold text-gray-900">{{
-                        selectedRequest?.user?.name
-                    }}</span
-                    >.
-                </p>
-
-                <!-- Action Buttons -->
-                <div class="flex justify-end gap-3">
-                    <button
-                        @click="showRejectionModal = false"
-                        type="button"
-                        class="px-4 py-2 text-sm border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        @click="reject(selectedRequest.id)"
-                        type="button"
-                        class="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium"
-                    >
-                        Confirm Rejection
-                    </button>
-                </div>
-            </div>
-        </Modal>
+        <ConfirmActionModal
+            :show="showRejectionModal"
+            actionType="reject"
+            title="Reject Request"
+            subtitle="Confirming this rejection."
+            confirmText="Confirm Rejection"
+            @close="showRejectionModal = false"
+            @confirm="reject(selectedRequest.id)"
+        >
+            <p v-if="selectedRequest">
+                Are you sure you want to reject the request for
+                <span class="font-semibold">{{
+                    selectedRequest.asset?.model_name
+                }}</span
+                >? This will deny the asset to
+                <span class="font-semibold text-gray-900">{{
+                    selectedRequest.user?.name
+                }}</span
+                >.
+            </p>
+        </ConfirmActionModal>
     </AuthenticatedLayout>
 </template>

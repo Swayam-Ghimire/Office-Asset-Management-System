@@ -17,7 +17,6 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'role:admin'])->controll
     Route::get('/users/{user}/edit', 'edit')->name('users.edit');
     Route::patch('/users/{user}', 'update')->name('users.update');
     Route::delete('/users/{user}', 'destroy')->name('users.destroy');
-    Route::post('/users/{user}/toggle', 'toggleStatus')->name('users.update-status');
 });
 
 // Notifications

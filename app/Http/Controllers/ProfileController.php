@@ -60,4 +60,18 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    public function updatePicture(Request $request)
+    {
+        $validated = $request->validate([
+            'img_path' => 'sometimes|nullable|image|mimes:png,jpg,jpeg|max:10000',
+        ]);
+        if ($request->hasFile('img_path')) {
+            $validated['img_path'] = $request->file('img_path')->store('users', 'public');
+        }
+        $request->user()->update($validated);
+        flash_success('User Profile Updated');
+
+        return back();
+    }
 }

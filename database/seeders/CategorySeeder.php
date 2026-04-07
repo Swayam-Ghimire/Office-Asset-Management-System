@@ -17,7 +17,6 @@ class CategorySeeder extends Seeder
         Category::create(['name'=>'Car']);
         Category::create(['name'=>'Monitor']);
         Category::create(['name'=>'Bike']);
-        Category::create(['name'=>'Pens']);
         Category::create(['name'=>'Printers']);
         Category::create(['name'=>'Scanner']);
         Category::create(['name'=>'Other']);

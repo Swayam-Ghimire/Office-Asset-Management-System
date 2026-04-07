@@ -1,7 +1,8 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import ConfirmActionModal from "@/Components/Modals/ConfirmActionModal.vue"
 
 const props = defineProps({
     stats: Object,
@@ -10,6 +11,21 @@ const props = defineProps({
     recentAssignments: Array,
     assetsByCategory: Object,
 });
+
+const showApproveModal = ref(false);
+const showRejectionModal = ref(false);
+
+const selectedRequest = ref(null);
+
+function confirmApproval(request) {
+    showApproveModal.value = true;
+    selectedRequest.value = request;
+} 
+
+function confirmRejection(request) {
+    showRejectionModal.value = true;
+    selectedRequest.value = request;
+}
 
 function approveRequest(id) {
     router.put(route('asset-requests.approve', id), {}, { preserveScroll: true });
@@ -126,13 +142,13 @@ const categoryData = computed(() => {
                                     </div>
                                     <div class="flex gap-2 shrink-0">
                                         <button
-                                            @click="approveRequest(req.id)"
+                                            @click="confirmApproval(req)"
                                             class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg transition-colors font-medium"
                                         >
                                             Approve
                                         </button>
                                         <button
-                                            @click="rejectRequest(req.id)"
+                                            @click="confirmRejection(req)"
                                             class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3 py-1.5 rounded-lg transition-colors font-medium"
                                         >
                                             Reject
@@ -233,5 +249,50 @@ const categoryData = computed(() => {
                 </template>
             </div>
         </div>
+        <!-- Approval Modal -->
+        <ConfirmActionModal
+            :show="showApproveModal"
+            actionType="approve"
+            title="Approve Request"
+            subtitle="Confirming this approval."
+            confirmText="Confirm Approval"
+            @close="showApproveModal = false"
+            @confirm="approveRequest(selectedRequest.id)"
+        >
+            <p v-if="selectedRequest">
+                Are you sure you want to approve the request for
+                <span class="font-semibold">{{
+                    selectedRequest.asset?.model_name ??
+                    selectedRequest.asset?.name
+                }}</span
+                >? This will assign the asset to
+                <span class="font-semibold text-gray-900">{{
+                    selectedRequest.user?.name
+                }}</span
+                >.
+            </p>
+        </ConfirmActionModal>
+        <!-- Rejection Modal -->
+        <ConfirmActionModal
+            :show="showRejectionModal"
+            actionType="reject"
+            title="Reject Request"
+            subtitle="Confirming this rejection."
+            confirmText="Confirm Rejection"
+            @close="showRejectionModal = false"
+            @confirm="rejectRequest(selectedRequest.id)"
+        >
+            <p v-if="selectedRequest">
+                Are you sure you want to reject the request for
+                <span class="font-semibold">{{
+                    selectedRequest.asset?.model_name
+                }}</span
+                >? This will deny the asset to
+                <span class="font-semibold text-gray-900">{{
+                    selectedRequest.user?.name
+                }}</span
+                >.
+            </p>
+        </ConfirmActionModal>
     </AuthenticatedLayout>
 </template>
