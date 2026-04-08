@@ -65,7 +65,11 @@ import {
     faUser,
     faUserPen,
     faUsers,
-    faInbox
+    faInbox,
+    faSearch,
+    faPen,
+    faTrash,
+    faBoxArchive,
 } from "@fortawesome/free-solid-svg-icons";
 
 
@@ -123,6 +127,11 @@ library.add(
     faUsers,
     faHourglassHalf,
     faInbox,
+    faSearch,
+    faPen,
+    faTrash,
+    faBoxArchive,
+    
 );
 
 

@@ -43,10 +43,6 @@ const deleteUser = (id) => {
     }
 };
 
-// const toggleStatus = (user) => {
-//     const newStatus = user.status === 1 ? 0 : 1;
-//     router.patch(route("users.update-status", user.id), { status: newStatus });
-// };
 </script>
 
 <template>

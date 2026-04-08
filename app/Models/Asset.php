@@ -18,7 +18,7 @@ class Asset extends Model
         'status',
         'img_path',
     ];
-    protected $hidden = ['created_at', 'updated_at'];
+    protected $hidden = ['updated_at'];
 
 
     // Relationships 

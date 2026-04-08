@@ -12,7 +12,6 @@ defineProps({
 
 const form = useForm({
     model_name: "",
-    // quantity: 1,
     category_id: "",
     brand: "",
     purchase_date: "",

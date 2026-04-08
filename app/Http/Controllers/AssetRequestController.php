@@ -36,7 +36,6 @@ class AssetRequestController extends Controller
         return Inertia::render('AssetRequests/Index', [
             'requests' => $requests,
             'filters' => $request->only(['status']),
-            'isAdmin' => $user->hasRole('admin'),
         ]);
     }
 
@@ -51,10 +50,6 @@ class AssetRequestController extends Controller
 
         $selected = $request->filled('asset_id') ? Asset::with('category')->find($request->asset_id) : null;
 
-        // // Pre-select if ?asset_id= was passed (from Home.vue Request button)
-        // $preselected = $request->filled('asset_id')
-        //     ? Asset::with('category')->find($request->asset_id)
-        //     : null;
 
         return Inertia::render('AssetRequests/Create', [
             'assets' => $assets,
@@ -136,15 +131,13 @@ class AssetRequestController extends Controller
             'status' => 'assigned',
         ]);
 
-        // Update asset status
-        // $asset->update(['status' => 'assigned']);
 
         // Log
         AssetLog::create([
             'asset_id' => $asset->id,
             'user_id' => Auth::id(),
             'action' => 'approved',
-            'remarks' => 'Request approved and asset assigned to user'.$assetRequest->user_id,
+            'remarks' => 'Request approved and asset assigned to user'.$assetRequest->user->name,
         ]);
         flash_success("Request approved and asset assigned.");
         return back();
@@ -176,7 +169,7 @@ class AssetRequestController extends Controller
             'asset_id' => $assetRequest->asset_id,
             'user_id' => Auth::id(),
             'action' => 'rejected',
-            'remarks' => 'Request rejected by admin',
+            'remarks' => 'Request rejected by' . Auth::id(),
         ]);
         flash_success("Request rejected.");
         return back();

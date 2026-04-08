@@ -265,7 +265,9 @@ const statusDot = {
 
                 <!-- Empty State -->
                 <div v-else class="bg-white rounded-xl border border-gray-100 shadow-sm p-16 text-center">
-                    <div class="text-6xl mb-4">📭</div>
+                    <div class="text-5xl mb-4 text-rose-400">
+                        <fa-icon icon="box"/>
+                    </div>
                     <h3 class="text-lg font-semibold text-gray-700 mb-1">No assets found</h3>
                     <p class="text-sm text-gray-400 mb-4">Try adjusting your filters or add a new asset.</p>
                     <button @click="resetFilters" class="text-red-600 text-sm underline">Clear filters</button>

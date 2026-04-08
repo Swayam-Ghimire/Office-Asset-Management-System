@@ -126,9 +126,10 @@ const pendingCount = computed(() => page.props.pending_requests_count ?? 0);
 
                 <!-- Both: request history / log -->
                 <SidebarLink
+                    v-if="!isAdmin"
                     :href="route('asset-requests.index')"
                     icon="clock-rotate-left"
-                    :label="isAdmin ? 'Request History' : 'My Requests'"
+                    label="My Request"
                 />
 
                 <!-- Assignments — admin sees all, employee sees own -->

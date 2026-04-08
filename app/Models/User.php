@@ -36,7 +36,7 @@ class User extends Authenticatable
         ];
     }
 
-    // ── Relationships ──────────────────────────────────────────────
+    // Relationships 
 
     public function department()
     {
@@ -56,6 +56,10 @@ class User extends Authenticatable
     public function maintenanceReports()
     {
         return $this->hasMany(AssetMaintenance::class, 'reported_by');
+    }
+
+    public function logs() {
+        return $this->hasMany(AssetLog::class);
     }
 
     // Helpers

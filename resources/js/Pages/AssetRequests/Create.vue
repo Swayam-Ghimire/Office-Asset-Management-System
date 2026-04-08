@@ -9,11 +9,11 @@ const props = defineProps({
     selected: Object, // full asset object passed when coming from asset card
 });
 
-// ── search / filter state ─────────────────────────────────────
+// search / filter state
 const search = ref("");
 const selectedCat = ref("");
 
-// ── form ─────────────────────────────────────────────────────
+// form
 const form = useForm({
     asset_id: props.selected?.id ?? null,
     reason: "",
@@ -125,45 +125,6 @@ const conditionBadge = {
                     {{ $page.props.flash.error }}
                 </div>
 
-                <!-- Pre-selected banner — shown when arriving from an asset card -->
-                <div
-                    v-if="selected && form.asset_id === selected.id"
-                    class="mb-6 flex items-center gap-3 bg-blue-50 border border-blue-200 text-blue-800 px-5 py-3.5 rounded-xl"
-                >
-                    <div
-                        class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center shrink-0"
-                    >
-                        
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="font-semibold text-sm">
-                            {{ selected.model_name }}
-                        </p>
-                        <p class="text-xs text-blue-600 mt-0.5">
-                            {{ selected.category?.name }}
-                            <span v-if="selected.brand">
-                                · {{ selected.brand }}</span
-                            >
-                            <span v-if="selected.quantity !== undefined">
-                                · {{ selected.quantity }} unit{{
-                                    selected.quantity !== 1 ? "s" : ""
-                                }}
-                                available
-                            </span>
-                        </p>
-                    </div>
-                    <button
-                        type="button"
-                        @click="
-                            form.asset_id = null;
-                            search = '';
-                        "
-                        class="text-xs text-blue-500 hover:text-blue-700 underline shrink-0"
-                    >
-                        Change
-                    </button>
-                </div>
-
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- ── LEFT: asset picker ── -->
                     <div class="lg:col-span-2 space-y-4">
@@ -172,19 +133,10 @@ const conditionBadge = {
                             class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center"
                         >
                             <div class="flex-1 min-w-[180px] relative">
-                                <svg
-                                    class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
-                                    />
-                                </svg>
+                                <fa-icon
+                                    icon="search"
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                />
                                 <input
                                     v-model="search"
                                     type="text"
@@ -239,7 +191,9 @@ const conditionBadge = {
                                         "
                                         class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-colors text-rose-500"
                                     >
-                                        <CategoryIcon :name="asset.category?.name"/>
+                                        <CategoryIcon
+                                            :name="asset.category?.name"
+                                        />
                                     </div>
 
                                     <div class="flex-1 min-w-0">
@@ -256,21 +210,9 @@ const conditionBadge = {
                                                 v-if="
                                                     form.asset_id === asset.id
                                                 "
-                                                class="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center shrink-0 mt-0.5"
+                                                class="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center shrink-0 mt-0.5 text-white"
                                             >
-                                                <svg
-                                                    class="w-3 h-3 text-white"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="3"
-                                                        d="M5 13l4 4L19 7"
-                                                    />
-                                                </svg>
+                                                <fa-icon icon="check" />
                                             </div>
                                         </div>
 
@@ -330,20 +272,10 @@ const conditionBadge = {
                             v-else
                             class="bg-white rounded-xl border border-gray-100 shadow-sm p-12 text-center"
                         >
-                            <div class="flex justify-center mb-3">
-                                <svg
-                                    class="w-10 h-10 text-gray-300"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="1.8"
-                                        d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
-                                    />
-                                </svg>
+                            <div
+                                class="flex justify-center mb-3 text-slate-400"
+                            >
+                                <fa-icon icon="search" />
                             </div>
                             <p class="text-sm font-semibold text-gray-600 mb-1">
                                 No assets match your search
@@ -392,24 +324,12 @@ const conditionBadge = {
                                         <div
                                             class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center shrink-0"
                                         >
-                                            <svg
-                                                class="w-5 h-5 text-red-700"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    :d="
-                                                        categoryIconPath(
-                                                            selectedAsset
-                                                                .category?.name,
-                                                        )
-                                                    "
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="1.8"
-                                                />
-                                            </svg>
+                                            <CategoryIcon
+                                                :name="
+                                                    selectedAsset.category?.name
+                                                "
+                                                size="sm"
+                                            />
                                         </div>
                                         <div class="min-w-0 flex-1">
                                             <p
@@ -444,9 +364,7 @@ const conditionBadge = {
                                                 "
                                                 class="text-xs font-medium mt-0.5"
                                             >
-                                                {{
-                                                    selectedAsset.quantity
-                                                }}
+                                                {{ selectedAsset.quantity }}
                                                 unit{{
                                                     selectedAsset.quantity !== 1
                                                         ? "s"
@@ -498,21 +416,9 @@ const conditionBadge = {
 
                                 <!-- Info -->
                                 <div
-                                    class="flex items-start gap-2 p-3 bg-blue-50 border border-blue-100 rounded-lg"
+                                    class="flex items-start gap-2 p-3 bg-blue-50 border border-blue-100 rounded-lg text-blue-500"
                                 >
-                                    <svg
-                                        class="w-4 h-4 text-blue-400 mt-0.5 shrink-0"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                        />
-                                    </svg>
+                                    <fa-icon icon="triangle-exclamation" />
                                     <p
                                         class="text-xs text-blue-700 leading-relaxed"
                                     >
@@ -540,25 +446,6 @@ const conditionBadge = {
                                         v-if="form.processing"
                                         class="flex items-center justify-center gap-2"
                                     >
-                                        <svg
-                                            class="w-4 h-4 animate-spin"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <circle
-                                                class="opacity-25"
-                                                cx="12"
-                                                cy="12"
-                                                r="10"
-                                                stroke="currentColor"
-                                                stroke-width="4"
-                                            />
-                                            <path
-                                                class="opacity-75"
-                                                fill="currentColor"
-                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                                            />
-                                        </svg>
                                         Submitting…
                                     </span>
                                     <span v-else>

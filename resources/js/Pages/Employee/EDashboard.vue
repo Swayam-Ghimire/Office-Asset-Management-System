@@ -423,7 +423,9 @@ const statusColors = {
                         </div>
 
                         <div v-else class="px-6 py-16 text-center">
-                            <div class="text-4xl mb-3">📋</div>
+                            <div class="text-4xl mb-3 text-yellow-300">
+                                <fa-icon icon="clipboard-list"/>
+                            </div>
                             <p class="text-sm font-medium text-gray-600 mb-1">
                                 No requests yet
                             </p>
