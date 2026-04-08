@@ -21,6 +21,8 @@ class AssetAssignment extends Model
         'assigned_date' => 'datetime',
         'return_date'   => 'datetime',
     ];
+    protected $hidden = ['created_at', 'updated_at'];
+
 
     // Relationships 
 

@@ -2,7 +2,7 @@
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 
 
 const page = usePage();
@@ -78,7 +78,7 @@ const updatePhotoPreview = (event) => {
                             class="h-full w-full object-cover"
                         >
                     </div>
-                    
+
                     <button
                         type="button"
                         class="px-4 py-2 bg-white border border-gray-300 rounded-lg font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150"
@@ -102,8 +102,8 @@ const updatePhotoPreview = (event) => {
                     leave-active-class="transition ease-in-out"
                     leave-to-class="opacity-0"
                 >
-                    <p v-if="form.processing" class="text-sm text-gray-600">
-                        Saving...
+                    <p v-if="form.wasSuccessful" class="text-sm text-gray-600">
+                        Saved
                     </p>
                 </Transition>
             </div>

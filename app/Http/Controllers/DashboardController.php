@@ -56,7 +56,7 @@ class DashboardController extends Controller
                 ->where('status', 'assigned')
                 ->get(),
             // The user's recent request history
-            'myRequests' => AssetRequest::with('asset')
+            'myRequests' => AssetRequest::with('asset.category')
                 ->where('user_id', $user->id)
                 ->latest()
                 ->take(5)

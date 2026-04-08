@@ -3,7 +3,8 @@ import { ref } from "vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import ConfirmActionModal from "@/Components/Modals/ConfirmActionModal.vue";
-import Modal from "@/Components/Modal.vue";
+import CategoryIcon from "@/Components/UI/CategoryIcon.vue";
+
 
 const props = defineProps({
     stats: Object,
@@ -78,18 +79,6 @@ const statusColors = {
     returned: "bg-gray-100 text-gray-600 border border-gray-200",
 };
 
-const categoryIcon = (name) => {
-    if (!name) return "📦";
-    const n = name.toLowerCase();
-    if (n.includes("laptop")) return "💻";
-    if (n.includes("monitor")) return "🖥️";
-    if (n.includes("mouse")) return "🖱️";
-    if (n.includes("keyboard")) return "⌨️";
-    if (n.includes("chair")) return "🪑";
-    if (n.includes("phone")) return "📱";
-    if (n.includes("tablet")) return "📟";
-    return "📦";
-};
 </script>
 
 <template>
@@ -137,9 +126,9 @@ const categoryIcon = (name) => {
                     >
                         <div class="flex items-center gap-3 mb-3">
                             <div
-                                class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-lg"
+                                class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-lg text-blue-500"
                             >
-                                🔗
+                                <fa-icon icon="link"/>
                             </div>
                             <p
                                 class="text-xs font-medium text-gray-400 uppercase tracking-wide"
@@ -158,9 +147,9 @@ const categoryIcon = (name) => {
                     >
                         <div class="flex items-center gap-3 mb-3">
                             <div
-                                class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center text-lg"
+                                class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center text-lg text-orange-500"
                             >
-                                ⏳
+                                <fa-icon icon="hourglass-half"/>
                             </div>
                             <p
                                 class="text-xs font-medium text-gray-400 uppercase tracking-wide"
@@ -181,9 +170,9 @@ const categoryIcon = (name) => {
                     >
                         <div class="flex items-center gap-3 mb-3">
                             <div
-                                class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center text-lg"
+                                class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center text-lg text-green-700"
                             >
-                                ✅
+                                <fa-icon icon="check" />
                             </div>
                             <p
                                 class="text-xs font-medium text-gray-400 uppercase tracking-wide"
@@ -202,9 +191,9 @@ const categoryIcon = (name) => {
                     >
                         <div class="flex items-center gap-3 mb-3">
                             <div
-                                class="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center text-lg"
+                                class="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center text-lg text-gray-600"
                             >
-                                ↩️
+                                <fa-icon icon="arrow-right-from-bracket" />
                             </div>
                             <p
                                 class="text-xs font-medium text-gray-400 uppercase tracking-wide"
@@ -257,9 +246,9 @@ const categoryIcon = (name) => {
                             >
                                 <!-- Icon -->
                                 <div
-                                    class="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-100 flex items-center justify-center text-2xl shrink-0"
+                                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-100 flex items-center justify-center text-2xl shrink-0 text-stone-700"
                                 >
-                                    {{ categoryIcon(a.asset?.category?.name) }}
+                                    <CategoryIcon :name="a.asset?.category.name" size="md"/>
                                 </div>
 
                                 <!-- Info -->
@@ -350,7 +339,9 @@ const categoryIcon = (name) => {
                         </div>
 
                         <div v-else class="px-6 py-16 text-center">
-                            <div class="text-5xl mb-4">📭</div>
+                            <div class="text-5xl mb-4 text-rose-500">
+                                <fa-icon icon="inbox"/>
+                            </div>
                             <p class="text-sm font-medium text-gray-600 mb-1">
                                 No assets assigned yet
                             </p>
@@ -393,11 +384,9 @@ const categoryIcon = (name) => {
                                 class="px-5 py-3.5 flex items-center gap-3 hover:bg-gray-50 transition-colors"
                             >
                                 <div
-                                    class="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-lg shrink-0"
+                                    class="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-lg shrink-0 text-indigo-700"
                                 >
-                                    {{
-                                        categoryIcon(req.asset?.category?.name)
-                                    }}
+                                    <CategoryIcon :name="req.asset?.category?.name" size="sm"/>
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <p
@@ -459,7 +448,9 @@ const categoryIcon = (name) => {
                             :href="route('home')"
                             class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-red-200 hover:shadow-md transition-all group flex flex-col items-start"
                         >
-                            <div class="text-2xl mb-2">📦</div>
+                            <div class="text-2xl mb-2 text-green-500">
+                                <fa-icon icon="box"/>
+                            </div>
                             <p
                                 class="font-semibold text-gray-900 text-sm group-hover:text-red-600 transition-colors"
                             >
@@ -474,7 +465,9 @@ const categoryIcon = (name) => {
                             :href="route('asset-requests.create')"
                             class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-red-200 hover:shadow-md transition-all group flex flex-col items-start"
                         >
-                            <div class="text-2xl mb-2">➕</div>
+                            <div class="text-2xl mb-2 text-blue-400">
+                                <fa-icon icon="plus"/>
+                            </div>
                             <p
                                 class="font-semibold text-gray-900 text-sm group-hover:text-red-600 transition-colors"
                             >
@@ -489,7 +482,9 @@ const categoryIcon = (name) => {
                             :href="route('asset-requests.index')"
                             class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-red-200 hover:shadow-md transition-all group flex flex-col items-start"
                         >
-                            <div class="text-2xl mb-2">📋</div>
+                            <div class="text-2xl mb-2 text-yellow-500">
+                                <fa-icon icon="clipboard-list"/>
+                            </div>
                             <p
                                 class="font-semibold text-gray-900 text-sm group-hover:text-red-600 transition-colors"
                             >
@@ -504,7 +499,9 @@ const categoryIcon = (name) => {
                             :href="route('asset-assignments.index')"
                             class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-red-200 hover:shadow-md transition-all group flex flex-col items-start"
                         >
-                            <div class="text-2xl mb-2">🗂️</div>
+                            <div class="text-2xl mb-2 text-rose-600">
+                                <fa-icon icon="clock-rotate-left" />
+                            </div>
                             <p
                                 class="font-semibold text-gray-900 text-sm group-hover:text-red-600 transition-colors"
                             >

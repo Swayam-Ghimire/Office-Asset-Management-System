@@ -137,8 +137,8 @@ const categoryData = computed(() => {
                                         <p class="text-sm font-medium text-gray-900 truncate">{{ req.user?.name }}</p>
                                         <p class="text-xs text-gray-500 truncate">
                                             Requested: <span class="font-medium text-gray-700">{{ req.asset?.model_name }}</span>
-                                            <span class="ml-1 text-gray-400">{{ req.asset?.reason }}</span>
                                         </p>
+                                        <span class="ml-1 text-gray-400">{{ req.reason }}</span>
                                     </div>
                                     <div class="flex gap-2 shrink-0">
                                         <button
@@ -157,7 +157,9 @@ const categoryData = computed(() => {
                                 </div>
                             </div>
                             <div v-else class="px-6 py-12 text-center">
-                                <div class="text-4xl mb-3">🎉</div>
+                                <div class="text-4xl mb-3 text-rose-300">
+                                    <fa-icon icon="cake-candles"/>
+                                </div>
                                 <p class="text-sm text-gray-500">No pending requests</p>
                             </div>
                         </div>
@@ -226,22 +228,30 @@ const categoryData = computed(() => {
                     <!-- Quick Links -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <Link :href="route('home')" class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-red-200 hover:shadow-md transition-all group">
-                            <div class="text-3xl mb-3">📦</div>
+                            <div class="text-3xl mb-3 text-rose-300">
+                                <fa-icon icon="tags"/>
+                            </div>
                             <p class="font-semibold text-gray-900 text-sm group-hover:text-red-600 transition-colors">All Assets</p>
                             <p class="text-xs text-gray-400 mt-0.5">View full inventory</p>
                         </Link>
                         <Link :href="route('asset-requests.index')" class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-red-200 hover:shadow-md transition-all group">
-                            <div class="text-3xl mb-3">📋</div>
+                            <div class="text-3xl mb-3 text-orange-400">
+                                <fa-icon icon="clipboard-list" />
+                            </div>
                             <p class="font-semibold text-gray-900 text-sm group-hover:text-red-600 transition-colors">Requests</p>
                             <p class="text-xs text-gray-400 mt-0.5">Manage all requests</p>
                         </Link>
                         <Link :href="route('asset-assignments.index')" class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-red-200 hover:shadow-md transition-all group">
-                            <div class="text-3xl mb-3">🔗</div>
+                            <div class="text-3xl mb-3 text-green-500">
+                                <fa-icon icon="link"/>
+                            </div>
                             <p class="font-semibold text-gray-900 text-sm group-hover:text-red-600 transition-colors">Assignments</p>
                             <p class="text-xs text-gray-400 mt-0.5">Track who has what</p>
                         </Link>
                         <Link :href="route('users.index')" class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-red-200 hover:shadow-md transition-all group">
-                            <div class="text-3xl mb-3">👥</div>
+                            <div class="text-3xl mb-3 text-blue-500">
+                                <fa-icon icon="users"/>
+                            </div>
                             <p class="font-semibold text-gray-900 text-sm group-hover:text-red-600 transition-colors">Users</p>
                             <p class="text-xs text-gray-400 mt-0.5">Manage employees</p>
                         </Link>

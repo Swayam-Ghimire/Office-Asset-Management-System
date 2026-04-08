@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import CategoryIcon from "@/Components/UI/CategoryIcon.vue";
 
 const props = defineProps({
     assets: Array, // available assets from controller
@@ -52,38 +53,7 @@ function submit() {
     form.post(route("asset-requests.store"));
 }
 
-// ── helpers ───────────────────────────────────────────────────
-const categoryIcon = (name) => {
-    if (!name) return "package";
-    const n = name.toLowerCase();
-    if (n.includes("laptop")) return "laptop";
-    if (n.includes("monitor")) return "desktop";
-    if (n.includes("mouse")) return "mouse";
-    if (n.includes("keyboard")) return "keyboard";
-    if (n.includes("chair")) return "chair";
-    if (n.includes("phone")) return "phone";
-    if (n.includes("tablet")) return "tablet";
-    return "package";
-};
-
-const categoryIconPath = (name) => {
-    const icon = categoryIcon(name);
-
-    const paths = {
-        laptop: "M3.75 6.75A2.25 2.25 0 016 4.5h12a2.25 2.25 0 012.25 2.25v8.25H3.75V6.75z M2.25 17.25h19.5",
-        desktop: "M3.75 5.25h16.5v10.5H3.75V5.25z M9 19.5h6 M12 15.75v3.75",
-        mouse: "M12 3.75a4.5 4.5 0 00-4.5 4.5v3.75a4.5 4.5 0 009 0V8.25A4.5 4.5 0 0012 3.75z M12 3.75V7.5",
-        keyboard:
-            "M3.75 6.75h16.5v10.5H3.75V6.75z M6.75 10.5h.008v.008H6.75V10.5z M9.75 10.5h.008v.008H9.75V10.5z M12.75 10.5h.008v.008h-.008V10.5z M15.75 10.5h.008v.008h-.008V10.5z M6.75 13.5h10.5",
-        chair: "M8.25 12.75h7.5V9a3.75 3.75 0 10-7.5 0v3.75z M8.25 12.75V18 M15.75 12.75V18 M6.75 18h10.5",
-        phone: "M9 3.75h6A2.25 2.25 0 0117.25 6v12A2.25 2.25 0 0115 20.25H9A2.25 2.25 0 016.75 18V6A2.25 2.25 0 019 3.75z M11.25 17.25h1.5",
-        tablet: "M7.5 3.75h9A2.25 2.25 0 0118.75 6v12A2.25 2.25 0 0116.5 20.25h-9A2.25 2.25 0 015.25 18V6A2.25 2.25 0 017.5 3.75z M11.25 17.25h1.5",
-        package:
-            "M20.25 7.5L12 12m0 0L3.75 7.5M12 12v9m8.25-13.5v9L12 21l-8.25-4.5v-9L12 3l8.25 4.5z",
-    };
-
-    return paths[icon] ?? paths.package;
-};
+// Helpers
 
 const conditionBadge = {
     new: "bg-violet-100 text-violet-700",
@@ -163,19 +133,7 @@ const conditionBadge = {
                     <div
                         class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center shrink-0"
                     >
-                        <svg
-                            class="w-5 h-5 text-blue-700"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                :d="categoryIconPath(selected.category?.name)"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.8"
-                            />
-                        </svg>
+                        
                     </div>
                     <div class="flex-1 min-w-0">
                         <p class="font-semibold text-sm">
@@ -279,25 +237,9 @@ const conditionBadge = {
                                                 ? 'bg-red-100'
                                                 : 'bg-gray-100'
                                         "
-                                        class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+                                        class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-colors text-rose-500"
                                     >
-                                        <svg
-                                            class="w-6 h-6 text-gray-600"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                :d="
-                                                    categoryIconPath(
-                                                        asset.category?.name,
-                                                    )
-                                                "
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="1.8"
-                                            />
-                                        </svg>
+                                        <CategoryIcon :name="asset.category?.name"/>
                                     </div>
 
                                     <div class="flex-1 min-w-0">

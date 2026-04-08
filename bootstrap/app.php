@@ -34,7 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return back();
             }
             // fallback for not -inertia requests
-            return redirect()->route('employee-dashboard');
+            return redirect()->route('home');
         });
         
     })->create();

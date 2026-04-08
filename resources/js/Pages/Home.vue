@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import CategoryIcon from '@/Components/UI/CategoryIcon.vue';
 
 const props = defineProps({
     assets: Object,
@@ -70,9 +71,7 @@ const statusDot = {
                     :href="route('assets.create')"
                     class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
                 >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
+                    <fa-icon icon="circle-plus"/>
                     Add Asset
                 </Link>
             </div>
@@ -84,21 +83,27 @@ const statusDot = {
                 <!-- Stats Bar -->
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-lg">📦</div>
+                        <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-lg text-slate-500">
+                            <fa-icon icon="box"/>
+                        </div>
                         <div>
                             <p class="text-xs text-gray-500 font-medium">Total</p>
                             <p class="text-2xl font-bold text-gray-900">{{ stats.total }}</p>
                         </div>
                     </div>
                     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-lg">✅</div>
+                        <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-lg text-green-700">
+                            <fa-icon icon="check"/>
+                        </div>
                         <div>
                             <p class="text-xs text-gray-500 font-medium">Available</p>
                             <p class="text-2xl font-bold text-emerald-600">{{ stats.available }}</p>
                         </div>
                     </div>
                     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-lg">✅</div>
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-lg text-blue-500">
+                            <fa-icon icon="mobile-screen" />
+                        </div>
                         <div>
                             <p class="text-xs text-gray-500 font-medium">Assigned to you</p>
                             <p class="text-2xl font-bold text-blue-600">{{ stats.assigned_to_you }}</p>
@@ -184,14 +189,7 @@ const statusDot = {
                                 class="h-full w-full object-cover"
                             />
                             <div v-else class="text-5xl select-none">
-                                {{
-                                    asset.category?.name?.toLowerCase().includes('laptop') ? '💻' :
-                                    asset.category?.name?.toLowerCase().includes('monitor') ? '🖥️' :
-                                    asset.category?.name?.toLowerCase().includes('mouse') ? '🖱️' :
-                                    asset.category?.name?.toLowerCase().includes('keyboard') ? '⌨️' :
-                                    asset.category?.name?.toLowerCase().includes('chair') ? '🪑' :
-                                    '📦'
-                                }}
+                                <CategoryIcon :name="asset?.category?.name" size="lg"/>
                             </div>
 
                             <!-- Status badge -->

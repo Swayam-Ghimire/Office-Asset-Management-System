@@ -15,7 +15,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [DashboardController::class, 'admin'])->middleware(['auth', 'verified', 'role:admin'])->name('dashboard');
 
-Route::get('/employee/dashboard', [DashboardController::class, 'employee'])->middleware(['auth', 'verified'])->name('employee-dashboard');
+Route::get('/employee/dashboard', [DashboardController::class, 'employee'])->middleware(['auth', 'verified', 'role:employee'])->name('employee-dashboard');
 
 Route::get('/home', [AssetController::class, 'index'])->middleware('auth')->name('home');
 

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
@@ -13,16 +12,26 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        Category::create(['name'=>'Chair']);
-        Category::create(['name'=>'Car']);
-        Category::create(['name'=>'Monitor']);
-        Category::create(['name'=>'Bike']);
-        Category::create(['name'=>'Printers']);
-        Category::create(['name'=>'Scanner']);
-        Category::create(['name'=>'Other']);
-        Category::create(['name'=>'Laptop']);
-        Category::create(['name'=>'CPU']);
-        Category::create(['name'=>'Software']);
+        Category::create(['name' => 'Laptop']);
+        Category::create(['name' => 'Monitor']);
+        Category::create(['name' => 'Screen']);
+        Category::create(['name' => 'Mouse']);
+        Category::create(['name' => 'Keyboard']);
+        Category::create(['name' => 'Chair']);
+        Category::create(['name' => 'Phone']);
+        Category::create(['name' => 'Tablet']);
+        Category::create(['name' => 'Printer']);
+        Category::create(['name' => 'Headset']);
+        Category::create(['name' => 'Camera']);
+        Category::create(['name' => 'USB']);
+        Category::create(['name' => 'Cable']);
+        Category::create(['name' => 'Bag']);
+        Category::create(['name' => 'Desk']);
+        Category::create(['name' => 'Software']);
+        Category::create(['name' => 'Others']);
+
+        
+
 
     }
 }

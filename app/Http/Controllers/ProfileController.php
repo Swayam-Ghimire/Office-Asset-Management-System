@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -63,13 +64,24 @@ class ProfileController extends Controller
 
     public function updatePicture(Request $request)
     {
-        $validated = $request->validate([
-            'img_path' => 'sometimes|nullable|image|mimes:png,jpg,jpeg|max:10000',
+        $request->validate([
+            'img_path' => 'nullable|image|mimes:png,jpg,jpeg|max:10000',
         ]);
+
+        $user = $request->user();
+
         if ($request->hasFile('img_path')) {
-            $validated['img_path'] = $request->file('img_path')->store('users', 'public');
+            // 1. Delete the old image only if a new one is successfully uploaded
+            if ($user->img_path) {
+                Storage::disk('public')->delete($user->img_path);
+            }
+
+            // 2. Store and update path
+            $user->update([
+                'img_path' => $request->file('img_path')->store('users', 'public'),
+            ]);
         }
-        $request->user()->update($validated);
+
         flash_success('User Profile Updated');
 
         return back();

@@ -8,6 +8,8 @@ class AssetMaintenance extends Model
 {
 
     protected $fillable = ['asset_id', 'reported_by', 'description', 'status', 'reported_at', 'resolved_at'];
+    protected $hidden = ['created_at', 'updated_at'];
+    
     public function asset()
     {
         return $this->belongsTo(Asset::class);

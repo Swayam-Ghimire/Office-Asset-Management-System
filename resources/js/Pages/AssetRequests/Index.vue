@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import ConfirmActionModal from "@/Components/Modals/ConfirmActionModal.vue";
+import CategoryIcon from "@/Components/UI/CategoryIcon.vue";
 
 const props = defineProps({
     requests: Object, // paginated
@@ -263,27 +264,9 @@ function fmt(date) {
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
                                             <div
-                                                class="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-lg shrink-0"
+                                                class="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-lg shrink-0 text-rose-400"
                                             >
-                                                <svg
-                                                    class="w-5 h-5 text-blue-700"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        :d="
-                                                            categoryIconPath(
-                                                                req.asset
-                                                                    .category
-                                                                    ?.name,
-                                                            )
-                                                        "
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="1.8"
-                                                    />
-                                                </svg>
+                                                <CategoryIcon :name="req.asset?.category?.name" size="sm"/>
                                             </div>
                                             <div>
                                                 <p
@@ -431,7 +414,9 @@ function fmt(date) {
 
                     <!-- Empty state -->
                     <div v-else class="px-6 py-16 text-center">
-                        <div class="text-5xl mb-4">📋</div>
+                        <div class="text-5xl mb-4 text-zinc-500">
+                            <fa-icon icon="clipboard-list" />
+                        </div>
                         <p class="text-sm font-semibold text-gray-600 mb-1">
                             No requests found
                         </p>
