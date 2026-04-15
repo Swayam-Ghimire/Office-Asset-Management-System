@@ -13,6 +13,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->controller(AssetCont
     Route::get('/assets/{asset}/edit', 'edit')->name('assets.edit');
     Route::patch('/assets/{asset}', 'update')->name('assets.update');
     Route::delete('/assets/{asset}', 'destroy')->name('assets.destroy');
+    Route::get('/assets/trash', 'trash')->name('assets.trash');
+    Route::post('/assets/restore/{id}', 'restore')->name('assets.restore');
+    Route::delete('/assets/force-delete/{id}', 'forceDelete')->name('assets.force-delete');
 });
 
 Route::controller(AssetController::class)->middleware('auth')->group(function () {

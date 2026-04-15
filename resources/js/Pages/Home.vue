@@ -187,7 +187,7 @@ const statusDot = {
                             <img
                                 v-if="asset.img_path"
                                 :src="`/storage/${asset.img_path}`"
-                                :alt="asset.name"
+                                :alt="asset.model_name"
                                 class="h-full w-full object-cover"
                             />
                             <div v-else class="text-5xl select-none">
@@ -204,7 +204,7 @@ const statusDot = {
                         <!-- Body -->
                         <div class="p-4 flex flex-col flex-1">
                             <div class="flex items-start justify-between gap-2 mb-1">
-                                <h3 class="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">{{ asset.name }}</h3>
+                                <h3 class="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">{{ asset.model_name }}</h3>
                                 <span :class="['text-xs px-1.5 py-0.5 rounded font-medium shrink-0', conditionColors[asset.condition]]">
                                     {{ asset.condition.charAt(0).toUpperCase() + asset.condition.slice(1) }}
                                 </span>

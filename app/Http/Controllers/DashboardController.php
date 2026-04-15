@@ -18,7 +18,7 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', ['stats' => [
             'total_assets' => Asset::count(),
             'available' => Asset::where('status', 'available')->count(),
-            'assigned' => Asset::where('status', 'assigned')->count(),
+            'assigned' => AssetAssignment::where('status', 'assigned')->count(),
             'maintenance' => AssetMaintenance::where('status', 'under_maintenance')->count(),
             'pending_requests' => AssetRequest::where('status', 'pending')->count(),
             'total_users' => User::count(),

@@ -9,12 +9,12 @@ const props = defineProps({
     assets: Object, // paginated (onlyTrashed)
 });
 
-// ── Restore ───────────────────────────────────────────────────
+//  Restore 
 function restore(id) {
     router.post(route('assets.restore', id), {}, { preserveScroll: true });
 }
 
-// ── Force delete ──────────────────────────────────────────────
+//  Force delete 
 const showForceModal  = ref(false);
 const selectedAsset   = ref(null);
 

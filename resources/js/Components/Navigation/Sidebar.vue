@@ -102,6 +102,12 @@ const pendingCount = computed(() => page.props.pending_requests_count ?? 0);
                         icon="screwdriver-wrench"
                         label="Maintenance"
                     />
+                    <!-- Trash link — admin only -->
+                    <SidebarLink
+                        :href="route('assets.trash')"
+                        icon="trash"
+                        label="Asset Trash"
+                    />
                 </template>
             </SidebarSection>
 
@@ -126,7 +132,6 @@ const pendingCount = computed(() => page.props.pending_requests_count ?? 0);
 
                 <!-- Both: request history / log -->
                 <SidebarLink
-                    v-if="!isAdmin"
                     :href="route('asset-requests.index')"
                     icon="clock-rotate-left"
                     label="My Request"
