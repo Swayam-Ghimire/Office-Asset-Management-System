@@ -137,7 +137,7 @@ class AssetRequestController extends Controller
             'asset_id' => $asset->id,
             'user_id' => Auth::id(),
             'action' => 'approved',
-            'remarks' => 'Request approved and asset assigned to user'.$assetRequest->user->name,
+            'remarks' => 'Request approved and asset assigned to user '.$assetRequest->user->name,
         ]);
         flash_success("Request approved and asset assigned.");
         return back();
@@ -169,7 +169,7 @@ class AssetRequestController extends Controller
             'asset_id' => $assetRequest->asset_id,
             'user_id' => Auth::id(),
             'action' => 'rejected',
-            'remarks' => 'Request rejected by' . Auth::id(),
+            'remarks' => 'Request rejected by ' . $assetRequest->user->name,
         ]);
         flash_success("Request rejected.");
         return back();
