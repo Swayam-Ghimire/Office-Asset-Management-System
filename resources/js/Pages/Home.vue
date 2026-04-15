@@ -4,6 +4,8 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import CategoryIcon from '@/Components/UI/CategoryIcon.vue';
 
+
+console.log();
 const props = defineProps({
     assets: Object,
     categories: Array,

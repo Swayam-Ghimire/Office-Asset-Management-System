@@ -40,7 +40,10 @@ class HandleInertiaRequests extends Middleware
             'isAdmin' => $request->user()?->hasRole('admin'),
             'flash' => [
                 'success' => session('success'),
-                'error' => session('error'),
+                'error' => session('error') ?? ($request->cookie('_error') ? [
+                    'message' => $request->cookie('_error'),
+                    'id' => \Illuminate\Support\Str::uuid()->toString(),
+                ] : null),
             ],
             'pending_requests_count' => Auth::check()
     ? AssetRequest::where('status', 'pending')->count()

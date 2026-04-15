@@ -8,7 +8,8 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\RoleMiddleware;
-
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Illuminate\Support\Str;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => RoleMiddleware::class,
         ]);
+        $middleware->encryptCookies(except: ['_error']);
 
         //
     })
@@ -33,8 +35,19 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->header('X-Inertia')) {
                 return back();
             }
+
             // fallback for not -inertia requests
             return redirect()->route('home');
         });
-        
+        // $exceptions->render(function (MethodNotAllowedHttpException $e) {
+        //     flash_error($e->getMessage());
+        //     return redirect()->route('home');
+        // });
+
+        $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
+            return redirect()->route('home')->cookie(
+                '_error', $e->getMessage(), 1 // expires in 1 minute
+            );
+        });
+
     })->create();

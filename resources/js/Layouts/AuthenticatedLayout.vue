@@ -14,15 +14,16 @@ const sidebarOpen = ref(false);
 </script>
 
 <template>
+    
     <div class="flex h-screen overflow-hidden bg-gray-50">
 
-        <!-- ── Sidebar ─────────────────────────────────── -->
+        <!-- Sidebar  -->
         <Sidebar
             :open="sidebarOpen"
             @close="sidebarOpen = false"
         />
 
-        <!-- ── Main area ───────────────────────────────── -->
+        <!-- Main area  -->
         <div class="flex flex-col flex-1 min-w-0 overflow-y-auto">
 
             <!-- Top bar -->

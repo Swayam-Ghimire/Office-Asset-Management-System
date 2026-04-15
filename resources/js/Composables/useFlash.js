@@ -5,7 +5,6 @@ import { toast } from 'vue3-toastify';
 let seen = new Set(); // tracks shown flash IDs
 export function useFlash() {
     const page = usePage();
-
     watch(
         () => page.props.flash,
         (flash) => {
