@@ -50,10 +50,14 @@ Route::controller(AssetAssignmentController::class)->middleware('auth')->group(f
 });
 
 // Maintenance Management
-Route::controller(MaintenanceController::class)->prefix('admin')->middleware(['auth'])->group(function () {
+Route::controller(MaintenanceController::class)->middleware(['auth'])->group(function () {
+    Route::post('/maintenance', 'store')->name('maintenance.store');
     Route::get('/maintenance', 'index')->name('maintenance.index');
-    Route::get('/maintenance/{id}', 'show')->name('maintenance.show');
-    Route::patch('/maintenance/{id}/resolve', 'resolve')->name('maintenance.resolve');
+    Route::get('/maintenance/{maintenance}', 'show')->name('maintenance.show');
+
+    // admin only
+    Route::prefix('admin')->middleware('role:admin')->group(function () {
+        Route::patch('/maintenance/{id}/resolve', 'resolve')->name('maintenance.resolve');
+        Route::patch('/maintenance/{id}/in-progress', 'markInProgress')->name('maintenance.in_progress');
+    });
 });
-Route::get('/maintenance/create', [MaintenanceController::class, 'create'])->name('maintenance.create');
-Route::post('/maintenance', [MaintenanceController::class, 'store'])->name('maintenance.store');

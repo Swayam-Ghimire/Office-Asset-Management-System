@@ -2,18 +2,20 @@
 import { ref } from "vue";
 import { Head, Link, router, useForm, usePage } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import Modal from "@/Components/Modal.vue";
+import ResolveMaintenanceModal from "@/Components/Modals/ResolveMaintenanceModal.vue";
+import MarkInProgressModal from "@/Components/Modals/MarkInProgressModal.vue";
 import CategoryIcon from "@/Components/UI/CategoryIcon.vue";
 
 const props = defineProps({
     maintenances: Object, // paginated
+    filters: Object, // current filter values
 });
 
 const page = usePage();
 const isAdmin = page.props.isAdmin;
 
 // Filter
-const selectedStatus = ref("");
+const selectedStatus = ref(props.filters?.status ?? "");
 function applyFilter() {
     router.get(
         route("maintenance.index"),
@@ -25,9 +27,9 @@ function applyFilter() {
     );
 }
 
+const selectedRecord = ref(null);
 // Resolve modal (admin only)
 const showResolveModal = ref(false);
-const selectedRecord = ref(null);
 const resolveForm = useForm({
     resolution_note: "",
     new_condition: "good",
@@ -40,15 +42,31 @@ function openResolve(record) {
     showResolveModal.value = true;
 }
 
-function submitResolve() {
-    resolveForm.patch(route("maintenance.resolve", selectedRecord.value.id), {
-        onSuccess: () => {
-            showResolveModal.value = false;
-            selectedRecord.value = null;
-            resolveForm.reset();
-        },
-    });
+// function submitResolve() {
+//     resolveForm.patch(route("maintenance.resolve", selectedRecord.value.id), {
+//         onSuccess: () => {
+//             showResolveModal.value = false;
+//             selectedRecord.value = null;
+//             resolveForm.reset();
+//         },
+//     });
+// }
+
+// Mark as In Progress Modal (admin only)
+const showInProgressModal = ref(false);
+function openInProgress(record) {
+    selectedRecord.value = record;
+    showInProgressModal.value = true;
 }
+
+// function submitInProgress() {
+//     router.patch(route("maintenance.in_progress", selectedRecord.value.id), {
+//         onSuccess: () => {
+//             showInProgressModal.value = false;
+//             selectedRecord.value = null;
+//         },
+//     });
+// }
 
 function fmt(date) {
     if (!date) return "—";
@@ -68,7 +86,7 @@ const statusStyle = {
         pill: "bg-blue-100 text-blue-700 border-blue-200",
         dot: "bg-blue-400",
     },
-    completed: {
+    resolved: {
         pill: "bg-emerald-100 text-emerald-700 border-emerald-200",
         dot: "bg-emerald-400",
     },
@@ -102,7 +120,7 @@ const statusStyle = {
                         { value: '', label: 'All' },
                         { value: 'reported', label: 'Reported' },
                         { value: 'in_progress', label: 'In Progress' },
-                        { value: 'completed', label: 'Resolved' },
+                        { value: 'resolved', label: 'Resolved' },
                     ]"
                     :key="opt.value"
                     @click="
@@ -157,6 +175,7 @@ const statusStyle = {
                                     Status
                                 </th>
                                 <th
+                                    v-if="selectedStatus === ''"
                                     class="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase"
                                 >
                                     Action
@@ -253,7 +272,7 @@ const statusStyle = {
                                         {{
                                             record.status === "in_progress"
                                                 ? "In Progress"
-                                                : record.status === "completed"
+                                                : record.status === "resolved"
                                                   ? "Resolved"
                                                   : "Reported"
                                         }}
@@ -261,15 +280,35 @@ const statusStyle = {
                                 </td>
 
                                 <!-- Action -->
-                                <td class="px-6 py-4 text-right">
+                                <td
+                                    v-if="selectedStatus === ''"
+                                    class="px-6 py-4 text-right"
+                                >
                                     <div class="flex justify-end gap-2">
+                                        <!-- In Progress -->
                                         <button
                                             v-if="
                                                 isAdmin &&
-                                                record.status !== 'completed'
+                                                record.status === 'reported'
+                                            "
+                                            @click="openInProgress(record)"
+                                            class="inline-flex items-center gap-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-lg"
+                                        >
+                                            <fa-icon
+                                                icon="spinner"
+                                                class="w-3 h-3"
+                                            />
+                                            In Progress
+                                        </button>
+
+                                        <!-- Resolve -->
+                                        <button
+                                            v-if="
+                                                isAdmin &&
+                                                record.status === 'in_progress'
                                             "
                                             @click="openResolve(record)"
-                                            class="inline-flex items-center gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg transition-colors font-medium"
+                                            class="inline-flex items-center gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg"
                                         >
                                             <fa-icon
                                                 icon="screwdriver-wrench"
@@ -277,10 +316,10 @@ const statusStyle = {
                                             />
                                             Resolve
                                         </button>
+
+                                        <!-- Completed -->
                                         <span
-                                            v-else-if="
-                                                record.status === 'completed'
-                                            "
+                                            v-if="record.status === 'completed'"
                                             class="text-xs text-gray-400 italic px-2.5 py-1.5"
                                         >
                                             Resolved
@@ -339,113 +378,23 @@ const statusStyle = {
         </div>
 
         <!-- Resolve Modal -->
-        <Modal :show="showResolveModal" @close="showResolveModal = false">
-            <div class="p-6">
-                <div class="flex items-center gap-3 mb-5">
-                    <div
-                        class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0"
-                    >
-                        <fa-icon
-                            icon="screwdriver-wrench"
-                            class="w-5 h-5 text-emerald-600"
-                        />
-                    </div>
-                    <div>
-                        <h3 class="text-base font-semibold text-gray-900">
-                            Resolve Maintenance
-                        </h3>
-                        <p class="text-sm text-gray-500">
-                            {{ selectedRecord?.asset?.model_name }}
-                        </p>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <!-- Issue read-only -->
-                    <div>
-                        <label
-                            class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
-                        >
-                            Issue Description (read-only)
-                        </label>
-                        <p
-                            class="text-sm text-gray-700 bg-gray-50 rounded-lg px-3 py-2.5 border border-gray-100"
-                        >
-                            {{ selectedRecord?.description }}
-                        </p>
-                    </div>
-
-                    <!-- Resolution note -->
-                    <div>
-                        <label
-                            class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
-                        >
-                            Resolution Note
-                            <span class="font-normal normal-case text-gray-400"
-                                >(optional)</span
-                            >
-                        </label>
-                        <textarea
-                            v-model="resolveForm.resolution_note"
-                            rows="3"
-                            placeholder="Describe what was fixed or replaced…"
-                            class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none resize-none"
-                        ></textarea>
-                    </div>
-
-                    <!-- New condition -->
-                    <div>
-                        <label
-                            class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
-                        >
-                            Asset Condition After Repair
-                            <span class="text-rose-500">*</span>
-                        </label>
-                        <select
-                            v-model="resolveForm.new_condition"
-                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none"
-                        >
-                            <option value="new">New</option>
-                            <option value="good">Good</option>
-                            <option value="damaged">Damaged</option>
-                        </select>
-                        <p
-                            v-if="resolveForm.errors.new_condition"
-                            class="text-xs text-rose-600 mt-1"
-                        >
-                            {{ resolveForm.errors.new_condition }}
-                        </p>
-                        <p class="text-xs text-gray-400 mt-1">
-                            The asset will be marked as
-                            <span class="font-medium text-gray-600"
-                                >available</span
-                            >
-                            after resolving.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="flex justify-end gap-3 mt-6">
-                    <button
-                        @click="showResolveModal = false"
-                        class="px-4 py-2 text-sm border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        @click="submitResolve"
-                        :disabled="resolveForm.processing"
-                        class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors disabled:opacity-60"
-                    >
-                        <fa-icon
-                            v-if="resolveForm.processing"
-                            icon="circle-notch"
-                            class="w-3.5 h-3.5 animate-spin"
-                        />
-                        Mark as Resolved
-                    </button>
-                </div>
-            </div>
-        </Modal>
+        <ResolveMaintenanceModal
+            :show="showResolveModal"
+            :record="selectedRecord"
+            @close="showResolveModal = false"
+            @success="
+                showResolveModal = false;
+                selectedRecord = null;
+            "
+        />
+        <MarkInProgressModal
+            :show="showInProgressModal"
+            :record="selectedRecord"
+            @close="showInProgressModal = false"
+            @success="
+                showInProgressModal = false;
+                selectedRecord = null;
+            "
+        />
     </AuthenticatedLayout>
 </template>

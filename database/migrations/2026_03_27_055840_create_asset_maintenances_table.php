@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('asset_maintenances', function (Blueprint $table) {
             $table->id();
             $table->foreignId('asset_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('reported_by')->constrained('users')->on('id')->cascadeOnDelete();
+            $table->foreignId('reported_by')->nullable()->constrained('users')->nullOnDelete();
             $table->text('description');
-            $table->string('status')->default('reported'); // reported, in_progress, completed
+            $table->string('status')->default('reported'); // reported, in_progress, resolve
+            $table->text('resolution_note')->nullable();
             $table->timestamp('reported_at')->useCurrent();
             $table->timestamp('resolved_at')->nullable();
             $table->timestamps();

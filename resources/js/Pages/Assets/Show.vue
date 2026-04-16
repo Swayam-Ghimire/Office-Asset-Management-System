@@ -8,7 +8,7 @@ import AssetDetails from "./Partials/AssetDetails.vue";
 import AssetHistory from "./Partials/AssetHistory.vue";
 import AssetLogs from "./Partials/AssetLogs.vue";
 import AssetRequests from "./Partials/AssetRequests.vue";
-
+import AssetMaintenanceHistory from "./Partials/AssetMaintenanceHistory.vue";
 
 const props = defineProps({
     asset: { type: Object, required: true },
@@ -46,9 +46,6 @@ const logIcons = {
         color: "text-teal-500 bg-teal-50",
     },
 };
-
-
-
 
 function deleteAsset() {
     if (confirm("Move this asset to trash?")) {
@@ -117,9 +114,12 @@ function deleteAsset() {
 
         <div class="max-w-5xl mx-auto space-y-6">
             <!-- Tabs -->
-            <div v-if="isAdmin" class="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
+            <div
+                v-if="isAdmin"
+                class="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit"
+            >
                 <button
-                    v-for="tab in ['details', 'history', 'requests', 'logs']"
+                    v-for="tab in ['details', 'history', 'requests', 'logs', 'maintenance history']"
                     :key="tab"
                     @click="activeTab = tab"
                     :class="[
@@ -134,16 +134,32 @@ function deleteAsset() {
             </div>
 
             <!-- Details tab -->
-            <AssetDetails v-if="activeTab==='details'" :asset="asset" :conditionColors="conditionColors" :statusColors="statusColors" :isAdmin="isAdmin"/>
+            <AssetDetails
+                v-if="activeTab === 'details'"
+                :asset="asset"
+                :conditionColors="conditionColors"
+                :statusColors="statusColors"
+                :isAdmin="isAdmin"
+            />
 
             <!-- History (assignments) tab -->
-            <AssetHistory v-if="activeTab==='history'" :asset="asset" />
+            <AssetHistory v-if="activeTab === 'history'" :asset="asset" />
 
             <!-- Requests tab (admin sees reason) -->
-            <AssetRequests v-if="activeTab==='requests'" :asset="asset" />
+            <AssetRequests v-if="activeTab === 'requests'" :asset="asset" />
 
             <!-- Logs tab — timeline -->
-            <AssetLogs v-if="activeTab==='logs'" :asset="asset" :logIcons="logIcons"/>
+            <AssetLogs
+                v-if="activeTab === 'logs'"
+                :asset="asset"
+                :logIcons="logIcons"
+            />
+            <!-- Maintenance History tab -->
+            <AssetMaintenanceHistory
+                v-if="activeTab === 'maintenance history'"
+                :maintenances="asset.maintenance"
+                :logIcons="logIcons"
+            />
         </div>
     </AuthenticatedLayout>
 </template>

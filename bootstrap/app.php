@@ -46,7 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
             return redirect()->route('home')->cookie(
-                '_error', $e->getMessage(), 1 // expires in 1 minute
+                '_error', 'Get method not supported', 0.01 // expires in 1 second
             );
         });
 

@@ -1,20 +1,20 @@
 <script setup>
-import { computed } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
-import SidebarLink    from '@/Components/Navigation/SidebarLink.vue';
-import SidebarSection from '@/Components/Navigation/SidebarSection.vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import RoleBadge from '@/Components/Navigation/RoleBadge.vue';
+import { computed } from "vue";
+import { Link, usePage } from "@inertiajs/vue3";
+import SidebarLink from "@/Components/Navigation/SidebarLink.vue";
+import SidebarSection from "@/Components/Navigation/SidebarSection.vue";
+import ApplicationLogo from "@/Components/ApplicationLogo.vue";
+import RoleBadge from "@/Components/Navigation/RoleBadge.vue";
 
 defineProps({
     open: { type: Boolean, default: false },
 });
-const emit = defineEmits(['close']);
+const emit = defineEmits(["close"]);
 
-const page    = usePage();
+const page = usePage();
 const isAdmin = computed(() => page.props.isAdmin);
-const roles   = computed(() => page.props.auth?.roles ?? []);
-const primaryRole = computed(() => roles.value[0] ?? 'employee');
+const roles = computed(() => page.props.auth?.roles ?? []);
+const primaryRole = computed(() => roles.value[0] ?? "employee");
 
 // Pending request count shared from HandleInertiaRequests
 const pendingCount = computed(() => page.props.pending_requests_count ?? 0);
@@ -46,9 +46,13 @@ const pendingCount = computed(() => page.props.pending_requests_count ?? 0);
         ]"
     >
         <!-- Logo + App name -->
-        <div class="flex items-center gap-3 h-16 px-5 border-b border-gray-100 shrink-0">
+        <div
+            class="flex items-center gap-3 h-16 px-5 border-b border-gray-100 shrink-0"
+        >
             <Link
-                :href="isAdmin ? route('dashboard') : route('employee-dashboard')"
+                :href="
+                    isAdmin ? route('dashboard') : route('employee-dashboard')
+                "
                 class="flex items-center gap-2.5 min-w-0"
             >
                 <ApplicationLogo />
@@ -62,7 +66,6 @@ const pendingCount = computed(() => page.props.pending_requests_count ?? 0);
 
         <!-- Nav links — scrollable -->
         <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-4">
-
             <!-- Dashboard (both roles) -->
             <SidebarSection label="Overview">
                 <SidebarLink
@@ -82,7 +85,11 @@ const pendingCount = computed(() => page.props.pending_requests_count ?? 0);
             </SidebarSection>
 
             <!-- Asset Management -->
-            <SidebarSection label="Asset Management" :collapsible="true" :default-open="true">
+            <SidebarSection
+                label="Asset Management"
+                :collapsible="true"
+                :default-open="true"
+            >
                 <!-- All users see the asset list -->
                 <SidebarLink
                     :href="route('home')"
@@ -112,7 +119,11 @@ const pendingCount = computed(() => page.props.pending_requests_count ?? 0);
             </SidebarSection>
 
             <!-- Request System -->
-            <SidebarSection label="Request System" :collapsible="true" :default-open="true">
+            <SidebarSection
+                label="Request System"
+                :collapsible="true"
+                :default-open="true"
+            >
                 <!-- Admin: pending requests with live badge -->
                 <SidebarLink
                     v-if="isAdmin"
@@ -132,6 +143,7 @@ const pendingCount = computed(() => page.props.pending_requests_count ?? 0);
 
                 <!-- Both: request history / log -->
                 <SidebarLink
+                    v-show="!isAdmin"
                     :href="route('asset-requests.index')"
                     icon="clock-rotate-left"
                     label="My Request"
@@ -146,7 +158,12 @@ const pendingCount = computed(() => page.props.pending_requests_count ?? 0);
             </SidebarSection>
 
             <!-- User Management (admin only) -->
-            <SidebarSection v-if="isAdmin" label="User Management" :collapsible="true" :default-open="false">
+            <SidebarSection
+                v-if="isAdmin"
+                label="User Management"
+                :collapsible="true"
+                :default-open="false"
+            >
                 <SidebarLink
                     :href="route('users.index')"
                     icon="users"
@@ -167,7 +184,6 @@ const pendingCount = computed(() => page.props.pending_requests_count ?? 0);
                     label="Upload Asset PDF"
                 />
             </SidebarSection> -->
-
         </nav>
 
         <!-- Sidebar footer -->

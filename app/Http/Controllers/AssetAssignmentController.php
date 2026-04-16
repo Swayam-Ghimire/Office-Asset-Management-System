@@ -19,7 +19,7 @@ class AssetAssignmentController extends Controller
 
         $query = AssetAssignment::with(['asset.category', 'user']);
 
-        if (!$user->hasRole('admin')) {
+        if (! $user->hasRole('admin')) {
             $query->where('user_id', $user->id);
         }
 
@@ -31,8 +31,7 @@ class AssetAssignmentController extends Controller
 
         return Inertia::render('AssetAssignments/Index', [
             'assignments' => $assignments,
-            'filters'     => $request->only(['status']),
-            'isAdmin'     => $user->hasRole('admin'),
+            'filters' => $request->only(['status']),
         ]);
     }
 
@@ -43,18 +42,25 @@ class AssetAssignmentController extends Controller
     {
         $user = Auth::user();
 
+
+        // Notify employee to return asset if admin is returning 
+
+
+
+        
         // Employees can only return their own assets
-        if (!$user->hasRole('admin') && $assetAssignment->user_id !== $user->id) {
+        if (! $user->hasRole('admin') && $assetAssignment->user_id !== $user->id) {
             abort(403);
         }
 
         if ($assetAssignment->status !== 'assigned') {
             flash_error('This asset has already been returned.');
+
             return back();
         }
 
         $assetAssignment->update([
-            'status'      => 'returned',
+            'status' => 'returned',
             'return_date' => now(),
         ]);
 
@@ -63,12 +69,13 @@ class AssetAssignmentController extends Controller
 
         AssetLog::create([
             'asset_id' => $assetAssignment->asset_id,
-            'user_id'  => Auth::id(),
-            'action'   => 'returned',
-            'remarks'  => 'Asset returned by user #' . $assetAssignment->user_id,
+            'user_id' => Auth::id(),
+            'action' => 'returned',
+            'remarks' => 'Asset returned by user #'.$user->name,
         ]);
 
         flash_success('Asset returned successfully.');
+
         return back();
     }
 }

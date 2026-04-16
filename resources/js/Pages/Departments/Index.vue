@@ -9,7 +9,7 @@ const props = defineProps({
     departments: Object, // paginated
 });
 
-// ── Create ────────────────────────────────────────────────────
+// ── Create 
 const createForm = useForm({ name: '' });
 function submitCreate() {
     createForm.post(route('departments.store'), {
@@ -17,7 +17,7 @@ function submitCreate() {
     });
 }
 
-// ── Edit ──────────────────────────────────────────────────────
+// ── Edit 
 const editingId = ref(null);
 const editForm  = useForm({ name: '' });
 
@@ -35,7 +35,7 @@ function submitEdit(dept) {
     });
 }
 
-// ── Delete ────────────────────────────────────────────────────
+// ── Delete 
 const showDeleteModal = ref(false);
 const deletingDept   = ref(null);
 
