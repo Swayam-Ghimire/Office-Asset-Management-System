@@ -45,6 +45,10 @@ const logIcons = {
         icon: "screwdriver-wrench",
         color: "text-teal-500 bg-teal-50",
     },
+    maintenance_in_progress: {
+        icon: "spinner",
+        color: "text-amber-500 bg-amber-50",
+    }
 };
 
 function deleteAsset() {

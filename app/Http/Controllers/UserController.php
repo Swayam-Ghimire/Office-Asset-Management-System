@@ -73,11 +73,11 @@ class UserController extends Controller
         $user->assignRole($validated['role']);
 
         // Email to the user ..... for password reset link
-
         Password::broker()->sendResetLink([
-            'email' => $user->email
+            'email' => $user->email,
         ]);
         flash_success('User created');
+
         return redirect()->route('users.index');
     }
 
@@ -100,7 +100,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,'.$user->id,
             'department_id' => 'nullable|exists:departments,id',
             'role' => 'required|in:admin,employee',
-            'status' => 'sometimes|integer',
+            'status' => 'required|integer',
             'password' => 'nullable|string|min:8|confirmed',
             'img_path' => 'sometimes|nullable|image|max:2048',
         ]);
@@ -119,34 +119,41 @@ class UserController extends Controller
         $user->syncRoles([$validated['role']]);
 
         flash_success('User updated successfully.');
-        return redirect()->route('users.index');
-    }
 
-    public function toggleStatus(User $user)
-    {
-        $user->update([
-            'status' => $user->status === 1 ? 0 : 1,
-        ]);
-        flash_success('User status updated.');
-        return back();
+        return redirect()->route('users.index');
     }
 
     public function show(User $user)
     {
-        // Inertia render show page
-        
-        return Inertia::render('Users/Show', [
-            'user' => $user->load(['department', 'roles'])
+        $user->load([
+            'department',
+            'roles',
+            'assignments' => fn ($q) => $q->with('asset.category')->withTrashed()->latest(),
+            'requests' => fn ($q) => $q->with('asset')->withTrashed()->latest()->take(20),
         ]);
 
+        return Inertia::render('Users/Show', [
+            'user' => $user,
+        ]);
     }
 
+    /**
+     * Fix: guard against admin deleting their own account.
+     * Without this, the admin is logged out mid-session and the
+     * subsequent redirect fails with an unauthenticated error.
+     */
     public function destroy(Request $request, User $user)
     {
-        if ($request->user()->hasRole('admin')) {
-            $user->delete();
+        if ($request->user()->id === $user->id) {
+            flash_error('You cannot delete your own account.');
+
+            return back();
         }
+
+        $user->delete();
+
         flash_success('User deleted successfully.');
+
         return redirect()->route('users.index');
     }
 }

@@ -5,7 +5,6 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import CategoryIcon from '@/Components/UI/CategoryIcon.vue';
 
 
-console.log();
 const props = defineProps({
     assets: Object,
     categories: Array,
@@ -83,7 +82,7 @@ const statusDot = {
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
                 <!-- Stats Bar -->
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-2 gap-4">
                     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
                         <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-lg text-slate-500">
                             <fa-icon icon="box"/>
@@ -102,7 +101,7 @@ const statusDot = {
                             <p class="text-2xl font-bold text-emerald-600">{{ stats.available }}</p>
                         </div>
                     </div>
-                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
+                    <div v-if="!$page.props.isAdmin" class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
                         <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-lg text-blue-500">
                             <fa-icon icon="mobile-screen" />
                         </div>

@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class SetPasswordNotification extends Notification
+class SetPasswordNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -39,7 +39,7 @@ class SetPasswordNotification extends Notification
         $url = url(route('password.reset', ['token' => $this->token, 'email' => $notifiable->email], false));
 
         return (new MailMessage)
-            ->subject('You are invited to join the system')
+            ->subject('You are invited to join the system')                      
             ->greeting('Hello ' . $notifiable->name . ',')
             ->line('An account has been created for you.')
             ->line('Please click the button below to set your password and access the system.')

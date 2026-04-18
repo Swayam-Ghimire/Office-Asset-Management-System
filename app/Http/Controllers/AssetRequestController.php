@@ -6,6 +6,8 @@ use App\Models\Asset;
 use App\Models\AssetAssignment;
 use App\Models\AssetLog;
 use App\Models\AssetRequest;
+use App\Notifications\Employee\RequestApprovedNotification;
+use App\Notifications\Employee\RequestRejectedNotification;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -122,16 +124,17 @@ class AssetRequestController extends Controller
             'approved_by' => Auth::id(),
             'approved_at' => now(),
         ]);
-
+        
         // Create assignment
         AssetAssignment::create([
             'asset_id' => $asset->id,
             'user_id' => $assetRequest->user_id,
             'assigned_date' => now(),
             'status' => 'assigned',
-        ]);
-
-
+            ]);
+            
+            //sends notification
+            $assetRequest->user->notify(new RequestApprovedNotification($assetRequest));
         // Log
         AssetLog::create([
             'asset_id' => $asset->id,
@@ -165,11 +168,14 @@ class AssetRequestController extends Controller
             $asset->update(['status' => 'available']);
         }
 
+        // Rejection notification
+        $assetRequest->user->notify(new RequestRejectedNotification($assetRequest));
+
         AssetLog::create([
             'asset_id' => $assetRequest->asset_id,
             'user_id' => Auth::id(),
             'action' => 'rejected',
-            'remarks' => 'Request rejected by ' . $assetRequest->user->name,
+            'remarks' => 'Request rejected by ' . Auth::user()->name,
         ]);
         flash_success("Request rejected.");
         return back();

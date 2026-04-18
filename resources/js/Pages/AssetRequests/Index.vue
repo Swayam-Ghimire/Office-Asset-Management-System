@@ -6,14 +6,12 @@ import ConfirmActionModal from "@/Components/Modals/ConfirmActionModal.vue";
 import CategoryIcon from "@/Components/UI/CategoryIcon.vue";
 import { usePage } from "@inertiajs/vue3";
 
-
 const page = usePage();
-const isAdmin = page.props.isAdmin
+const isAdmin = page.props.isAdmin;
 const props = defineProps({
     requests: Object, // paginated
     filters: Object,
 });
-
 
 const selectedStatus = ref(props.filters?.status ?? "");
 
@@ -270,13 +268,18 @@ function fmt(date) {
                                     <td v-if="isAdmin" class="px-6 py-4">
                                         <div class="flex items-center gap-2">
                                             <img
+                                                v-if="req?.user?.img_path"
                                                 :src="
-                                                    '/storage/' +
-                                                        req.user?.img_path ??
-                                                    `https://ui-avatars.com/api/?name=${encodeURIComponent(req.user.name)}&color=7F9CF5&background=EBF4FF`
+                                                    '/storage/' + req.user.img_path
                                                 "
-                                                :alt="req.user.name"
+                                                :alt="req.user?.name"
                                                 class="h-10 w-10 rounded-full object-cover border border-gray-200"
+                                            />
+                                            <img
+                                                v-else
+                                                :src="`https://ui-avatars.com/api/?name=${encodeURIComponent(req.user.name)}&color=7F9CF5&background=EBF4FF`"
+                                                :alt="req.user.name"
+                                                class="h-10 w-10 rounded-full border border-gray-200"
                                             />
                                             <div>
                                                 <p

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AssetAssignment;
 use App\Models\AssetLog;
+use App\Models\AssetMaintenance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -41,37 +42,42 @@ class AssetAssignmentController extends Controller
     public function return(AssetAssignment $assetAssignment)
     {
         $user = Auth::user();
-
-
-        // Notify employee to return asset if admin is returning 
-
-
-
-        
         // Employees can only return their own assets
         if (! $user->hasRole('admin') && $assetAssignment->user_id !== $user->id) {
             abort(403);
+            }
+            
+            if ($assetAssignment->status !== 'assigned') {
+                flash_error('This asset has already been returned.');
+                
+                return back();
+                }
+                
+                $assetAssignment->update([
+                    'status' => 'returned',
+                    'return_date' => now(),
+                    ]);
+                    
+        // Notify employee to return asset if admin is returning 
+        
+        
+        // If there is one, keep it as under_maintenance so admin can service it.
+        $hasOpenMaintenance = AssetMaintenance::where('asset_id', $assetAssignment->asset_id)
+            ->whereIn('status', ['reported', 'in_progress'])
+            ->exists();
+ 
+        if ($hasOpenMaintenance) {
+            // Asset stays under_maintenance — admin will resolve it and set available
+            $assetAssignment->asset->update(['status' => 'under_maintenance']);
+        } else {
+            $assetAssignment->asset->update(['status' => 'available']);
         }
-
-        if ($assetAssignment->status !== 'assigned') {
-            flash_error('This asset has already been returned.');
-
-            return back();
-        }
-
-        $assetAssignment->update([
-            'status' => 'returned',
-            'return_date' => now(),
-        ]);
-
-        // Make asset available again
-        $assetAssignment->asset->update(['status' => 'available']);
 
         AssetLog::create([
             'asset_id' => $assetAssignment->asset_id,
             'user_id' => Auth::id(),
             'action' => 'returned',
-            'remarks' => 'Asset returned by user #'.$user->name,
+            'remarks' => 'Asset returned by user '.$user->name . ($hasOpenMaintenance ? ' (open maintenance report - kept under maintenance)' : ''),
         ]);
 
         flash_success('Asset returned successfully.');

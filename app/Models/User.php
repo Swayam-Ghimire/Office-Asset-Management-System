@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Notifications\Employee\AccountStatusChangeNotification;
+use App\Notifications\SetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,7 +12,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles, SoftDeletes;
+    use HasFactory, HasRoles, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -25,18 +27,18 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
+            'password' => 'hashed',
         ];
     }
 
-    // Relationships 
+    // Relationships
 
     public function department()
     {
@@ -58,7 +60,8 @@ class User extends Authenticatable
         return $this->hasMany(AssetMaintenance::class, 'reported_by');
     }
 
-    public function logs() {
+    public function logs()
+    {
         return $this->hasMany(AssetLog::class);
     }
 
@@ -72,5 +75,19 @@ class User extends Authenticatable
     public function isActive(): bool
     {
         return $this->status === 1;
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new SetPasswordNotification($token));
+    }
+
+    protected static function booted()
+    {
+        static::updated(function ($user) {
+            if ($user->wasChanged('status')) {
+                $user->notify(new AccountStatusChangeNotification($user->status));
+            }
+        });
     }
 }

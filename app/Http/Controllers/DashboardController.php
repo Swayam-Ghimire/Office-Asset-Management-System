@@ -15,14 +15,15 @@ class DashboardController extends Controller
 {
     public function admin(Request $request)
     {
-        return Inertia::render('Dashboard', ['stats' => [
-            'total_assets' => Asset::count(),
-            'available' => Asset::where('status', 'available')->count(),
-            'assigned' => AssetAssignment::where('status', 'assigned')->count(),
-            'maintenance' => AssetMaintenance::where('status', 'under_maintenance')->count(),
-            'pending_requests' => AssetRequest::where('status', 'pending')->count(),
-            'total_users' => User::count(),
-        ],
+        return Inertia::render('Dashboard', [
+            'stats' => [
+                'total_assets' => Asset::count(),
+                'available' => Asset::where('status', 'available')->count(),
+                'assigned' => AssetAssignment::where('status', 'assigned')->count(),
+                'maintenance' => AssetMaintenance::whereIn('status', ['in_progress'])->count(),
+                'pending_requests' => AssetRequest::where('status', 'pending')->count(),
+                'total_users' => User::count(),
+            ],
             // Get 5 most recent pending requests with relationships
             'pendingRequests' => AssetRequest::with(['user', 'asset'])
                 ->where('status', 'pending')
@@ -34,7 +35,7 @@ class DashboardController extends Controller
                 ->latest()
                 ->take(10)
                 ->get(),
-            // Count assets per category for the chart: ['Laptop' => 5, 'Monitor' => 3]
+                
             'assetsByCategory' => Category::withCount('assets')
                 ->pluck('assets_count', 'name'),
         ]);
@@ -43,6 +44,7 @@ class DashboardController extends Controller
     public function employee(Request $request)
     {
         $user = $request->user();
+
         return Inertia::render('Employee/EDashboard', [
             'stats' => [
                 'my_assets' => AssetAssignment::where('user_id', $user->id)->where('status', 'assigned')->count(),

@@ -92,7 +92,7 @@ const deleteUser = (id) => {
                                 v-model="search"
                                 @keyup.enter="applyFilters"
                                 type="text"
-                                placeholder="Name, code, brand…"
+                                placeholder="Name, email"
                                 class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
                             />
                         </div>

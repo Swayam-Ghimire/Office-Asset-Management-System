@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
+use App\Models\AssetAssignment;
 use App\Models\AssetLog;
 use App\Models\AssetMaintenance;
+use App\Notifications\Employee\ReturnRequestedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -18,10 +20,9 @@ class MaintenanceController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $query = AssetMaintenance::with(['asset.category', 'reporter']);
+        $query = AssetMaintenance::with(['asset.category', 'reporter.assignments']);
 
         if (! $user->hasRole('admin')) {
-            // Employee sees only records they reported
             $query->where('reported_by', $user->id);
         }
 
@@ -38,28 +39,8 @@ class MaintenanceController extends Controller
     }
 
     /**
-     * Single maintenance record detail.
-     * Admin can always view. Employee can only view their own.
-     */
-    // public function show(Request $request, AssetMaintenance $maintenance)
-    // {
-    //     $user = $request->user();
-
-    //     if (! $user->hasRole('admin') && $maintenance->reported_by !== $user->id) {
-    //         abort(403);
-    //     }
-
-    //     $maintenance->load(['asset.category', 'reporter']);
-
-    //     return Inertia::render('Maintenance/Show', [
-    //         'maintenance' => $maintenance,
-    //         'isAdmin'     => $user->hasRole('admin'),
-    //     ]);
-    // }
-
-    /**
      * Employee reports an issue on an asset they hold.
-     * Status: reported → asset: under_maintenance.
+     * Fix: set asset status to under_maintenance (not not_available).
      */
     public function store(Request $request)
     {
@@ -70,7 +51,6 @@ class MaintenanceController extends Controller
 
         $asset = Asset::findOrFail($validated['asset_id']);
 
-        // Prevent duplicate open reports for the same asset
         $alreadyOpen = AssetMaintenance::where('asset_id', $asset->id)
             ->whereIn('status', ['reported', 'in_progress'])
             ->exists();
@@ -89,7 +69,8 @@ class MaintenanceController extends Controller
             'reported_at' => now(),
         ]);
 
-        // Asset is no longer available while under maintenance
+        // Fix: correct status — under_maintenance means it is being serviced,
+        // not_available means pending a request. These are different concepts.
         $asset->update(['status' => 'under_maintenance']);
 
         AssetLog::create([
@@ -99,21 +80,16 @@ class MaintenanceController extends Controller
             'remarks' => 'Issue reported by '.Auth::user()->name.': '.$validated['description'],
         ]);
 
-        // Notify admin
+        // TODO: notify admins here (phase 3)
 
         flash_success('Issue reported. The asset has been flagged for maintenance.');
 
         return back();
     }
 
-    /**
-     * Admin acknowledges the report — moves to in_progress.
-     * Triggered when admin is actively working on the asset.
-     * Asset stays under_maintenance.
-     */
     public function markInProgress(Request $request, $id)
     {
-        $maintenance = AssetMaintenance::findOrFail($id);
+        $maintenance = AssetMaintenance::with('asset')->findOrFail($id);
 
         if ($maintenance->status !== 'reported') {
             flash_error('Only reported issues can be moved to in progress.');
@@ -121,7 +97,23 @@ class MaintenanceController extends Controller
             return back();
         }
 
+        // Guard: asset must NOT still be assigned — employee must have returned it first.
+        $stillAssigned = AssetAssignment::where('asset_id', $maintenance->asset_id)
+            ->where('status', 'assigned')
+            ->exists();
+
+        if ($stillAssigned) {
+            flash_error('The asset is still assigned to an employee. Ask them to return it before starting maintenance.');
+
+            return back();
+        }
+
         $maintenance->update(['status' => 'in_progress']);
+
+        $maintenance->asset()->update([
+            'status' => 'under_maintenance',
+            'condition' => 'damaged',
+        ]);
 
         AssetLog::create([
             'asset_id' => $maintenance->asset_id,
@@ -137,13 +129,13 @@ class MaintenanceController extends Controller
 
     /**
      * Admin resolves the maintenance.
-     * Status: completed → asset: available (condition updated).
+     * Status: resolved → asset: available (condition updated).
      */
     public function resolve(Request $request, $id)
     {
         $maintenance = AssetMaintenance::with('asset')->findOrFail($id);
 
-        if ($maintenance->status === 'completed') {
+        if ($maintenance->status === 'resolved') {
             flash_error('This maintenance record is already resolved.');
 
             return back();
@@ -160,8 +152,7 @@ class MaintenanceController extends Controller
             'resolution_note' => $validated['resolution_note'] ?? null,
         ]);
 
-        // Asset returns to available inventory with updated condition
-        $maintenance->asset->update([
+        $maintenance->asset?->update([
             'status' => 'available',
             'condition' => $validated['new_condition'],
         ]);
@@ -177,7 +168,63 @@ class MaintenanceController extends Controller
             'remarks' => 'Resolved by '.Auth::user()->name.$note,
         ]);
 
+        // // notify reporter
+
         flash_success('Maintenance resolved. Asset is now available.');
+
+        return back();
+    }
+
+    /**
+     * Admin asks the assigned employee to return the asset for servicing.
+     * Sends a DB notification + queued email via ReturnRequestedNotification.
+     */
+    public function requestReturn(AssetMaintenance $maintenance, Request $request)
+    {
+        if ($maintenance->status === 'resolved') {
+            flash_error('This maintenance record is already resolved.');
+
+            return back();
+        }
+
+        $validated = $request->validate([
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        $maintenance->load(['asset.assignments' => function ($q) {
+            $q->where('status', 'assigned')->with('user')->latest();
+        }, 'asset.category']);
+
+        $activeAssignment = $maintenance->asset->assignments->first();
+
+        if (! $activeAssignment) {
+            flash_error('This asset does not have an active assignment. No one to notify.');
+
+            return back();
+        }
+
+        $employee = $activeAssignment->user;
+
+        if (! $employee) {
+            flash_error('Could not find the assigned employee.');
+
+            return back();
+        }
+
+        $employee->notify(
+            new ReturnRequestedNotification($maintenance, $validated['reason'] ?? null)
+        );
+
+        AssetLog::create([
+            'asset_id' => $maintenance->asset_id,
+            'user_id' => Auth::id(),
+            'action' => 'return_requested',
+            'remarks' => 'Return requested by '.Auth::user()->name
+                .' from '.$employee->name
+                .($validated['reason'] ? '. Note: '.$validated['reason'] : ''),
+        ]);
+
+        flash_success('Return request sent to '.$employee->name.' via notification and email.');
 
         return back();
     }

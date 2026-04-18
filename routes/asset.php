@@ -59,5 +59,6 @@ Route::controller(MaintenanceController::class)->middleware(['auth'])->group(fun
     Route::prefix('admin')->middleware('role:admin')->group(function () {
         Route::patch('/maintenance/{id}/resolve', 'resolve')->name('maintenance.resolve');
         Route::patch('/maintenance/{id}/in-progress', 'markInProgress')->name('maintenance.in_progress');
+        Route::post('/maintenance/{maintenance}/request-return', 'requestReturn')->name('maintenance.request-return');
     });
 });

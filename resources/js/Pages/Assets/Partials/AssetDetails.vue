@@ -149,7 +149,7 @@ function fmt(date) {
 
             <!-- Current assignment -->
             <div
-                v-if="asset.assignments.length !== 0 && isAdmin"
+                v-if="asset.assignments?.some(a => a.status === 'assigned') && isAdmin"
                 class="pt-4 border-t border-gray-100"
             >
                 <p
@@ -158,7 +158,7 @@ function fmt(date) {
                     Currently Assigned To
                 </p>
                 <div
-                    v-for="a in asset.assignments"
+                    v-for="a in asset.assignments.filter(x => x.status === 'assigned')"
                     :key="a.id"
                     class="flex items-center gap-3"
                 >

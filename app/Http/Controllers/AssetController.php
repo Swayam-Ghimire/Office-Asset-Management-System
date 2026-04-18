@@ -91,7 +91,7 @@ class AssetController extends Controller
     {
         $asset->load([
             'category',
-            'assignments' => fn ($q) => $q->with('user')->where('status', 'assigned')->withTrashed()->latest(),
+            'assignments' => fn ($q) => $q->with('user')->withTrashed()->latest(),
             'requests' => fn ($q) => $q->with('user')->withTrashed()->latest(),
             'maintenance' => fn ($q) => $q->with('reporter')->latest(),
             'logs' => fn ($q) => $q->with('user')->latest()->take(30),
@@ -123,7 +123,7 @@ class AssetController extends Controller
         ]);
 
         if ($request->hasFile('img_path')) {
-            if ($request->user()->img_path) {
+            if ($asset->img_path) {
                 Storage::disk('public')->delete('assets/'.$request->user()->img_path);
             }
             $validated['img_path'] = $request->file('img_path')->store('assets', 'public');
