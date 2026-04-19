@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Admin;
 
+use App\Models\AssetAssignment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -11,44 +12,39 @@ class ReturnedAssetNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct(
+        public AssetAssignment $assignment,
+    ) {}
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database', 'mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
+    public function toDatabase(object $notifiable): array
     {
         return [
-            //
+            'message' => $this->assignment->user->name
+                .' has returned '
+                .$this->assignment->asset->model_name.'.',
+            'type' => 'asset_returned',
+            'asset_id' => $this->assignment->asset_id,
+            'asset_name' => $this->assignment->asset->model_name,
+            'user_name' => $this->assignment->user->name,
         ];
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $asset = $this->assignment->asset;
+        $user = $this->assignment->user;
+
+        return (new MailMessage)
+            ->subject($user->name.' Returned: '.$asset->model_name)
+            ->greeting('Hello '.$notifiable->name.',')
+            ->line($user->name.' has returned **'.$asset->model_name.'**.')
+            ->line('The asset is now available in the inventory.')
+            ->action('View Asset', route('assets.show', $asset->id))
+            ->line('No action is required unless there is an open maintenance report for this asset.');
     }
 }

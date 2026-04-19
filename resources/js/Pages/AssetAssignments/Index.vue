@@ -48,6 +48,30 @@ function submitReturn() {
     );
 }
 
+// ── Request-return modal (admin only) ────────────────────────
+const showRequestReturnModal = ref(false);
+const returnForm = useForm({ reason: "" });
+
+function openRequestReturn(record) {
+    selectedRecord.value = record;
+    returnForm.reason = "";
+    showRequestReturnModal.value = true;
+}
+
+function submitRequestReturn() {
+    returnForm.post(
+        route("maintenance.request-return", selectedRecord.value.id),
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                showRequestReturnModal.value = false;
+                selectedRecord.value = null;
+                returnForm.reset();
+            },
+        },
+    );
+}
+
 // Report issue modal
 const showIssueModal = ref(false);
 const selectedAssetForIssue = ref(null);
@@ -270,7 +294,8 @@ function fmt(date) {
                                             />
                                         </Link>
                                         <!-- Report issue -->
-                                        <button v-if="!isAdmin"
+                                        <button
+                                            v-if="!isAdmin"
                                             @click="openIssueModal(a)"
                                             class="inline-flex items-center gap-1 text-xs border border-amber-200 text-amber-600 hover:bg-amber-50 px-2.5 py-1.5 rounded-lg transition-colors"
                                             title="Report an issue"
@@ -283,7 +308,7 @@ function fmt(date) {
                                         <div v-if="isAdmin">
                                             <button
                                                 v-if="a.status === 'assigned'"
-                                                @click="confirmReturn(a)"
+                                                @click="openRequestReturn(a)"
                                                 class="text-xs border border-rose-200 text-rose-600 hover:bg-rose-50 px-2.5 py-1.5 rounded-lg transition-colors"
                                             >
                                                 <fa-icon
@@ -397,5 +422,106 @@ function fmt(date) {
                 </p>
             </div>
         </ConfirmActionModal>
+        <!-- Request Return Modal -->
+        <Modal :show="showReturnModal" @close="showReturnModal = false">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-5">
+                    <div
+                        class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center shrink-0"
+                    >
+                        <fa-icon
+                            icon="rotate-left"
+                            class="w-5 h-5 text-rose-600"
+                        />
+                    </div>
+                    <div>
+                        <h3 class="text-base font-semibold text-gray-900">
+                            Request Asset Return
+                        </h3>
+                        <p class="text-sm text-gray-500">
+                            {{ selectedRecord?.asset?.model_name }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Context: who is being asked -->
+                <div
+                    class="mb-4 p-3 bg-gray-50 border border-gray-100 rounded-lg flex items-center gap-3"
+                >
+                    <img
+                        :src="`https://ui-avatars.com/api/?name=${encodeURIComponent(selectedRecord?.reporter?.name ?? 'U')}&color=ffffff&background=DC143C&size=32`"
+                        class="w-8 h-8 rounded-full shrink-0"
+                    />
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">
+                            {{ selectedRecord?.reporter?.name }}
+                        </p>
+                        <p class="text-xs text-gray-400">
+                            Will receive a notification and email asking them to
+                            return this asset.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Issue summary -->
+                <div class="mb-4">
+                    <label
+                        class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
+                    >
+                        Reported Issue (read-only)
+                    </label>
+                    <p
+                        class="text-sm text-gray-700 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2.5"
+                    >
+                        {{ selectedRecord?.description }}
+                    </p>
+                </div>
+
+                <!-- Optional admin note -->
+                <div class="mb-5">
+                    <label
+                        class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
+                    >
+                        Note to Employee
+                        <span class="font-normal normal-case text-gray-400"
+                            >(optional)</span
+                        >
+                    </label>
+                    <textarea
+                        v-model="returnForm.reason"
+                        rows="3"
+                        placeholder="Why to return this asset?"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-rose-400 focus:border-rose-400 outline-none resize-none"
+                    ></textarea>
+                    <p
+                        v-if="returnForm.errors.reason"
+                        class="text-xs text-rose-600 mt-1"
+                    >
+                        {{ returnForm.errors.reason }}
+                    </p>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button
+                        @click="showReturnModal = false"
+                        class="px-4 py-2 text-sm border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        @click="submitRequestReturn"
+                        :disabled="returnForm.processing"
+                        class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-medium transition-colors disabled:opacity-60"
+                    >
+                        <fa-icon
+                            v-if="returnForm.processing"
+                            icon="circle-notch"
+                            class="w-3.5 h-3.5 animate-spin"
+                        />
+                        Send Return Request
+                    </button>
+                </div>
+            </div>
+        </Modal>
     </AuthenticatedLayout>
 </template>

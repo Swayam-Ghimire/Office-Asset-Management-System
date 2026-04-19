@@ -6,6 +6,8 @@ use App\Models\Asset;
 use App\Models\AssetAssignment;
 use App\Models\AssetLog;
 use App\Models\AssetMaintenance;
+use App\Models\User;
+use App\Notifications\Admin\IssueReportedNotification;
 use App\Notifications\Employee\ReturnRequestedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -61,7 +63,7 @@ class MaintenanceController extends Controller
             return back();
         }
 
-        AssetMaintenance::create([
+        $maintenance = AssetMaintenance::create([
             'asset_id' => $asset->id,
             'reported_by' => Auth::id(),
             'description' => $validated['description'],
@@ -69,9 +71,7 @@ class MaintenanceController extends Controller
             'reported_at' => now(),
         ]);
 
-        // Fix: correct status — under_maintenance means it is being serviced,
-        // not_available means pending a request. These are different concepts.
-        $asset->update(['status' => 'under_maintenance']);
+        $asset->update(['status' => 'not_available']);
 
         AssetLog::create([
             'asset_id' => $asset->id,
@@ -79,8 +79,11 @@ class MaintenanceController extends Controller
             'action' => 'maintenance_reported',
             'remarks' => 'Issue reported by '.Auth::user()->name.': '.$validated['description'],
         ]);
-
-        // TODO: notify admins here (phase 3)
+        
+        $maintenance->load('asset', 'reporter');
+        User::role('admin')->each(
+            fn ($admin) => $admin->notify(new IssueReportedNotification($maintenance))
+        );
 
         flash_success('Issue reported. The asset has been flagged for maintenance.');
 

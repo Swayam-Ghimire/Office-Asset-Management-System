@@ -34,6 +34,7 @@ class RequestRejectedNotification extends Notification implements ShouldQueue
     public function toDatabase(object $notifiable):array {
         return [
             "message" => "Your request for " . $this->assetRequest->asset->model_name . " is rejected!",
+            "type" => "request_rejected",
         ];
     }
 }

@@ -48,7 +48,7 @@ const logIcons = {
     maintenance_in_progress: {
         icon: "spinner",
         color: "text-amber-500 bg-amber-50",
-    }
+    },
 };
 
 function deleteAsset() {
@@ -123,7 +123,13 @@ function deleteAsset() {
                 class="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit"
             >
                 <button
-                    v-for="tab in ['details', 'history', 'requests', 'logs', 'maintenance history']"
+                    v-for="tab in [
+                        'details',
+                        'history',
+                        'requests',
+                        'logs',
+                        'maintenance history',
+                    ]"
                     :key="tab"
                     @click="activeTab = tab"
                     :class="[
