@@ -49,6 +49,10 @@ const logIcons = {
         icon: "spinner",
         color: "text-amber-500 bg-amber-50",
     },
+    return_requested: {
+        icon: "rotate-left",
+        color: "text-rose-500 bg-gray-50",
+    }
 };
 
 function deleteAsset() {

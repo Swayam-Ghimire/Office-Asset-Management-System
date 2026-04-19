@@ -14,6 +14,8 @@ class AssetController extends Controller
 {
     public function index(Request $request)
     {
+
+        // scope for employee and admin
         $query = Asset::with('category');
 
         if ($request->filled('search')) {
@@ -87,15 +89,25 @@ class AssetController extends Controller
         return redirect()->route('home');
     }
 
-    public function show(Asset $asset)
+    public function show(Request $request, Asset $asset)
     {
-        $asset->load([
-            'category',
-            'assignments' => fn ($q) => $q->with('user')->withTrashed()->latest(),
-            'requests' => fn ($q) => $q->with('user')->withTrashed()->latest(),
-            'maintenance' => fn ($q) => $q->with('reporter')->latest(),
-            'logs' => fn ($q) => $q->with('user')->latest()->take(30),
-        ]);
+        $user = $request->user();
+
+        if ($user->hasRole('admin')) {
+            $asset->load([
+                'category',
+                'assignments' => fn ($q) => $q->with('user')->withTrashed()->latest(),
+                'requests' => fn ($q) => $q->with('user')->withTrashed()->latest(),
+                'maintenance' => fn ($q) => $q->with('reporter')->latest(),
+                'logs' => fn ($q) => $q->with('user')->latest()->take(30),
+            ]);
+        } else {
+            $asset->load([
+                'category',
+                'assignments' => fn ($q) => $q->where('user_id', $user->id)->latest(),
+                'requests' => fn ($q) => $q->where('user_id', $user->id)->latest(),
+            ]);
+        }
 
         return Inertia::render('Assets/Show', [
             'asset' => $asset,

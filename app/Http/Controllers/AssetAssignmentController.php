@@ -61,7 +61,7 @@ class AssetAssignmentController extends Controller
         ]);
 
         // Notify return asset to returning
-        $assetAssignment->load(['reporter', 'asset']);
+        $assetAssignment->load(['user', 'asset']);
         User::role('admin')->each(
             fn ($admin) => $admin->notify(new ReturnedAssetNotification($assetAssignment))
         );

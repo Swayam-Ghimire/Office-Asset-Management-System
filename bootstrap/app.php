@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckUserStatus;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+            CheckUserStatus::class,
         ]);
         $middleware->alias([
             'role' => RoleMiddleware::class,

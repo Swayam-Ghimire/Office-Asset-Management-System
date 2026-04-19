@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
-import { Head, Link, router, usePage } from "@inertiajs/vue3";
+import { Head, Link, router, usePage, useForm } from "@inertiajs/vue3";
+import Modal from "@/Components/Modal.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import ConfirmActionModal from "@/Components/Modals/ConfirmActionModal.vue";
 import CategoryIcon from "@/Components/UI/CategoryIcon.vue";
@@ -51,6 +52,7 @@ function submitReturn() {
 // ── Request-return modal (admin only) ────────────────────────
 const showRequestReturnModal = ref(false);
 const returnForm = useForm({ reason: "" });
+const selectedRecord = ref(null);
 
 function openRequestReturn(record) {
     selectedRecord.value = record;
@@ -295,7 +297,7 @@ function fmt(date) {
                                         </Link>
                                         <!-- Report issue -->
                                         <button
-                                            v-if="!isAdmin"
+                                            v-if="!isAdmin && a.status === 'assigned'"
                                             @click="openIssueModal(a)"
                                             class="inline-flex items-center gap-1 text-xs border border-amber-200 text-amber-600 hover:bg-amber-50 px-2.5 py-1.5 rounded-lg transition-colors"
                                             title="Report an issue"
@@ -423,7 +425,10 @@ function fmt(date) {
             </div>
         </ConfirmActionModal>
         <!-- Request Return Modal -->
-        <Modal :show="showReturnModal" @close="showReturnModal = false">
+        <Modal
+            :show="showRequestReturnModal"
+            @close="showRequestReturnModal = false"
+        >
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-5">
                     <div
@@ -503,7 +508,7 @@ function fmt(date) {
 
                 <div class="flex justify-end gap-3">
                     <button
-                        @click="showReturnModal = false"
+                        @click="showRequestReturnModal = false"
                         class="px-4 py-2 text-sm border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                         Cancel
