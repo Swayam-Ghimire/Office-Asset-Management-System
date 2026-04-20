@@ -386,10 +386,10 @@ function fmt(date) {
                                                     : "Rejected"
                                             }}
                                             <span
-                                                v-if="req.approved_at"
+                                                v-if="req.action_at"
                                                 class="block text-gray-300"
                                                 >{{
-                                                    fmt(req.approved_at)
+                                                    fmt(req.action_at)
                                                 }}</span
                                             >
                                         </span>

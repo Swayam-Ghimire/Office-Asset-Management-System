@@ -18,7 +18,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->integer('status')->default(0); // inactive
-            $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
+            // $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
+            $table->unsignedBigInteger('department_id')->nullable();
             $table->string('img_path')->nullable();
             $table->softDeletes();
             $table->rememberToken();

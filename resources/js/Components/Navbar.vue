@@ -13,7 +13,9 @@ defineProps({
         <div class="p-2 max-w mx-1 flex items-center justify-between">
             <!-- Logo -->
             <div class="text-xl font-bold text-gray-900 dark:text-white">
-                <ApplicationLogo />
+                <Link v-if="!user" :href="route('welcome')">
+                   <ApplicationLogo />
+               </Link>
             </div>
 
             <!-- Auth -->

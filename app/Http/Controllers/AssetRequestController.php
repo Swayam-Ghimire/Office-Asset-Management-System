@@ -121,8 +121,8 @@ class AssetRequestController extends Controller
         // Update request
         $assetRequest->update([
             'status' => 'approved',
-            'approved_by' => Auth::id(),
-            'approved_at' => now(),
+            'action_by' => Auth::user()->name,
+            'action_at' => now(),
         ]);
         
         // Create assignment
@@ -160,8 +160,8 @@ class AssetRequestController extends Controller
 
         $assetRequest->update([
             'status' => 'rejected',
-            'approved_by' => Auth::id(),
-            'approved_at' => now(),
+            'action_by' => Auth::user()->name,
+            'action_at' => now(),
         ]);
 
         if ($asset && $asset->status === 'not_available') {

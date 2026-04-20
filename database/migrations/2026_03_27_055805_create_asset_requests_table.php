@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('status')->default('pending'); // approved, rejected
             $table->timestamp('requested_at')->useCurrent();
             $table->longText('reason')->nullable();
-            $table->string('approved_by')->nullable();
-            $table->timestamp('approved_at')->nullable();
+            $table->string('action_by')->nullable();
+            $table->timestamp('action_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

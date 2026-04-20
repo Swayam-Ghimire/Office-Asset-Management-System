@@ -12,7 +12,7 @@ Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
     ]);
-});
+})->name('welcome');
 
 Route::get('/dashboard', [DashboardController::class, 'admin'])->middleware(['auth', 'verified', 'role:admin'])->name('dashboard');
 

@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
             $table->string('model_name')->unique();
-            $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
+            $table->unsignedBigInteger('category_id')->nullable();
+            // $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
             $table->string('brand')->nullable();
             $table->date('purchase_date')->nullable();
             $table->string('condition')->default('new'); // good, damaged

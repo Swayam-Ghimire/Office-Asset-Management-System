@@ -2,7 +2,7 @@
 const props = defineProps({
     asset: { type: Object, required: true },
 });
-
+    
 function fmt(date) {
     if (!date) return "—";
     return new Date(date).toLocaleDateString("en-US", {
