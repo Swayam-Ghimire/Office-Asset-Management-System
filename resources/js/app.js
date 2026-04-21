@@ -72,6 +72,7 @@ import {
     faTrash,
     faBoxArchive,
     faSpinner,
+    faHandPaper,
 } from "@fortawesome/free-solid-svg-icons";
 
 
@@ -134,8 +135,8 @@ library.add(
     faPen,
     faTrash,
     faBoxArchive,
-    faSpinner
-    
+    faSpinner,
+    faHandPaper
 );
 
 

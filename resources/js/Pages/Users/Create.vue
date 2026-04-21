@@ -14,8 +14,8 @@ defineProps({
 const form = useForm({
     name: "",
     email: "",
-    // password: "",
-    // password_confirmation: "",
+    password: "",
+    password_confirmation: "",
     status: 1,
     department_id: "",
     role: "employee",
@@ -71,7 +71,7 @@ const submit = () => {
                         </div>
 
                         <!-- Password -->
-                        <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <InputLabel for="password" value="Password" />
                                 <TextInput
@@ -95,7 +95,7 @@ const submit = () => {
                                     class="mt-1 w-full"
                                 />
                             </div>
-                        </div> -->
+                        </div>
 
                         <!-- Role & Department -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

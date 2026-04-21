@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Department;
 use App\Models\User;
+use App\Notifications\Employee\SendCredentialsNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -56,7 +57,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            // 'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8|confirmed',
             'department_id' => 'nullable|exists:departments,id',
             'role' => 'required|in:admin,employee',
             'status' => 'required',
@@ -65,17 +66,20 @@ class UserController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => Hash::make(Str::random(8)),
+            'password' => Hash::make($validated['password']),
             'department_id' => $validated['department_id'] ?? null,
             'status' => $validated['status'],
+            'welcome_email_sent' => false, 
         ]);
 
         $user->assignRole($validated['role']);
 
         // Email to the user ..... for password reset link
-        Password::broker()->sendResetLink([
-            'email' => $user->email,
-        ]);
+        // Password::broker()->sendResetLink([
+        //     'email' => $user->email,
+        // ]);
+        // Email user with their credentials
+        $user->notify(new SendCredentialsNotification($validated));
         flash_success('User created');
 
         return redirect()->route('users.index');
@@ -137,11 +141,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Fix: guard against admin deleting their own account.
-     * Without this, the admin is logged out mid-session and the
-     * subsequent redirect fails with an unauthenticated error.
-     */
     public function destroy(Request $request, User $user)
     {
         if ($request->user()->id === $user->id) {

@@ -47,6 +47,7 @@ class CreateAdmin extends Command
             'email' => $email,
             'password' => bcrypt($password),
             'status' => 1, // Set status to active
+            'welcome_email_sent' => false, 
             'department_id' => null, // Admin user does not belong to any department
             'img_path' => null, // No profile image for admin user
         ]);

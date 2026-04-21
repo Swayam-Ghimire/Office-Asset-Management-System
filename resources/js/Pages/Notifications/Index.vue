@@ -80,6 +80,10 @@ const iconMap = {
         icon: "screwdriver-wrench",
         color: "bg-emerald-100 text-emerald-600",
     },
+    welcome: {
+        icon: "hand-paper",
+        color: "bg-blue-100 text-blue-600",
+    },
 
     // Admin notifications
     issue_reported: {
@@ -170,6 +174,21 @@ const hasUnread = props.notifications.data.some((n) => !n.read_at);
                             <p class="text-sm text-gray-900 leading-snug">
                                 {{ notifMessage(notif) }}
                             </p>
+                            <!-- // Warning (if any) -->
+                            <div
+                                v-if="notif.data?.warning"
+                                class="mt-1.5 flex items-center gap-1.5 px-2 py-1 bg-amber-50 rounded border border-amber-100"
+                            >
+                                <fa-icon
+                                    icon="triangle-exclamation"
+                                    class="text-amber-600 w-3 h-3"
+                                />
+                                <span
+                                    class="text-[11px] font-medium text-amber-700 leading-tight"
+                                >
+                                    {{ notif.data.warning }}
+                                </span>
+                            </div>
                             <div class="flex items-center gap-3 mt-1 flex-wrap">
                                 <span class="text-xs text-gray-400">{{
                                     timeAgo(notif.created_at)
@@ -178,6 +197,18 @@ const hasUnread = props.notifications.data.some((n) => !n.read_at);
                                 <span class="text-xs text-gray-400">{{
                                     fmt(notif.created_at)
                                 }}</span>
+                                <Link
+                                    v-if="notif.data?.link"
+                                    :href="notif.data.link"
+                                    @click.stop
+                                    class="text-[11px] font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-0.5"
+                                >
+                                    Visit Profile
+                                    <fa-icon
+                                        icon="chevron-right"
+                                        class="w-2 h-2"
+                                    />
+                                </Link>
 
                                 <!-- Link to related asset -->
                                 <Link

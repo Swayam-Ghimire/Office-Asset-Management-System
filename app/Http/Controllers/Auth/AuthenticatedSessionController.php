@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Notifications\Employee\WelcomeNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,33 +32,29 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
-        // check if the user status is active or not
-        if ($request->user()->status === 1) {
-            $request->session()->regenerate();
-            flash_success('Logged in successfully.');
-            return redirect()->route('home');
-        }
-        else {
+        if ($request->user()->status !== 1) {
             Auth::guard('web')->logout();
-
             $request->session()->invalidate();
-
             $request->session()->regenerateToken();
+            flash_error('Your account in inactive!! Please contact the administrator to activate your account!');
 
-            flash_error('Your account is inactive. Please contact the administrator.');
-            return redirect()->route('login');
+            return redirect()->route('welcome');
         }
 
+        $request->session()->regenerate();
+        flash_success('Logged In successfully');
 
-        
-        if($request->user()->hasRole('admin')){
+        if ($request->user()->welcome_email_sent !== 1) {
+            $request->user()->notify(new WelcomeNotification());
+            $request->user()->welcome_email_sent = 1;
+            $request->user()->save();
+        }
+
+        if ($request->user()->hasRole('admin')) {
             return redirect()->intended(route('dashboard', absolute: false));
         }
 
-        else {
-            return redirect()->intended(route('home',
-            absolute: false));
-        }
+        return redirect()->intended(route('home', absolute: false));
     }
 
     /**
@@ -72,6 +69,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         flash_success('Logged out successfully.');
+
         return redirect('/login');
     }
 }

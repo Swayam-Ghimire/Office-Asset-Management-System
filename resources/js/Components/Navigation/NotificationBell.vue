@@ -55,6 +55,7 @@ const iconMap = {
     request_rejected: { icon: "circle-xmark", color: "text-rose-500" },
     asset_assigned: { icon: "link", color: "text-violet-500" },
     issue_reported: { icon: "triangle-exclamation", color: "text-amber-500" },
+    welcome: { icon: "hand-paper", color: "text-blue-500" },
 };
 
 function iconFor(type) {
@@ -143,22 +144,53 @@ function timeAgo(dateStr) {
                             class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0 mt-0.5"
                         >
                             <fa-icon
-                                :icon="iconFor(notif.type).icon"
+                                :icon="iconFor(notif.data.type).icon"
                                 :class="[
                                     'w-3.5 h-3.5',
-                                    iconFor(notif.type).color,
+                                    iconFor(notif.data.type).color,
                                 ]"
                             />
                         </div>
 
                         <!-- Content -->
-                        <div class="flex-1 min-w-0">
+                        <div class="flex-1 min-w-0 space-y-1">
                             <p class="text-sm text-gray-900 leading-snug">
                                 {{ notif.data?.message }}
                             </p>
-                            <p class="text-xs text-gray-400 mt-0.5">
-                                {{ timeAgo(notif.created_at) }}
-                            </p>
+                            <!-- // Warning (if any) -->
+                            <div
+                                v-if="notif.data?.warning"
+                                class="mt-1.5 flex items-center gap-1.5 px-2 py-1 bg-amber-50 rounded border border-amber-100"
+                            >
+                                <fa-icon
+                                    icon="triangle-exclamation"
+                                    class="text-amber-600 w-3 h-3"
+                                />
+                                <span
+                                    class="text-[11px] font-medium text-amber-700 leading-tight"
+                                >
+                                    {{ notif.data.warning }}
+                                </span>
+                            </div>
+
+                            <div class="flex items-center justify-between mt-1">
+                                <p class="text-[11px] text-gray-400">
+                                    {{ timeAgo(notif.created_at) }}
+                                </p>
+
+                                <Link
+                                    v-if="notif.data?.link"
+                                    :href="notif.data.link"
+                                    @click.stop
+                                    class="text-[11px] font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-0.5"
+                                >
+                                    Visit Profile
+                                    <fa-icon
+                                        icon="chevron-right"
+                                        class="w-2 h-2"
+                                    />
+                                </Link>
+                            </div>
                         </div>
 
                         <!-- Unread dot -->
