@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
-use App\Models\AssetLog;
 use App\Models\Category;
+use App\Services\AssetImportService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class AssetController extends Controller
 {
@@ -75,14 +75,7 @@ class AssetController extends Controller
             $validated['img_path'] = $request->file('img_path')->store('assets', 'public');
         }
 
-        $asset = Asset::create($validated);
-
-        AssetLog::create([
-            'asset_id' => $asset->id,
-            'user_id' => Auth::id(),
-            'action' => 'created',
-            'remarks' => 'Created by '.Auth::user()->name,
-        ]);
+        Asset::create($validated);
 
         flash_success('Asset created successfully.');
 
@@ -143,13 +136,6 @@ class AssetController extends Controller
 
         $asset->update($validated);
 
-        AssetLog::create([
-            'asset_id' => $asset->id,
-            'user_id' => Auth::id(),
-            'action' => 'updated',
-            'remarks' => 'Updated by '.Auth::user()->name,
-        ]);
-
         flash_success('Asset updated successfully.');
 
         return redirect()->route('home');
@@ -162,13 +148,6 @@ class AssetController extends Controller
 
             return back();
         }
-
-        AssetLog::create([
-            'asset_id' => $asset->id,
-            'user_id' => Auth::id(),
-            'action' => 'deleted',
-            'remarks' => 'Soft-deleted by '.Auth::user()->name,
-        ]);
 
         $asset->delete();
 
@@ -193,13 +172,6 @@ class AssetController extends Controller
         $asset = Asset::onlyTrashed()->findOrFail($id);
         $asset->restore();
 
-        AssetLog::create([
-            'asset_id' => $asset->id,
-            'user_id' => Auth::id(),
-            'action' => 'restored',
-            'remarks' => 'Restored from trash by '.Auth::user()->name,
-        ]);
-
         flash_success('Asset restored successfully.');
 
         return back();
@@ -213,5 +185,23 @@ class AssetController extends Controller
         flash_success('Asset permanently deleted.');
 
         return back();
+    }
+
+    public function upload(Request $request, AssetImportService $importService)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xls,xlsx,csv|max:10000',
+        ]);
+        try {
+            $importService->importFromExcel($request->file('file'));
+            flash_success('Excel Data Uploaded!!');
+
+            return back();
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            $errorMsg = "Row {$failures[0]->row()}: ".$failures[0]->errors()[0];
+
+            return back()->withErrors(['file' => $errorMsg]);
+        }
     }
 }

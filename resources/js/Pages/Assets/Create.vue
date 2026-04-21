@@ -1,14 +1,19 @@
 <script setup>
+import { ref } from 'vue';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { Head, useForm } from "@inertiajs/vue3";
+import ImportAssetsModal from "@/Components/Modals/ImportAssetModal.vue";
 
 defineProps({
     categories: Object,
 });
+
+const showingImportModal = ref(false);
 
 const form = useForm({
     model_name: "",
@@ -36,7 +41,14 @@ const submit = () => {
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Add New Asset
             </h2>
+            <SecondaryButton @click="showingImportModal = true">
+                Bulk Import (Excel)
+            </SecondaryButton>
         </template>
+        <ImportAssetsModal
+            :show="showingImportModal"
+            @close="showingImportModal = false"
+        />
 
         <div class="py-12">
             <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
@@ -46,7 +58,10 @@ const submit = () => {
                     <form @submit.prevent="submit" class="space-y-6">
                         <div class="grid grid-cols-2 md:grid-cols-2 gap-6">
                             <div>
-                                <InputLabel for="model_name" value="Model Asset Name" />
+                                <InputLabel
+                                    for="model_name"
+                                    value="Model Asset Name"
+                                />
                                 <TextInput
                                     id="model_name"
                                     type="text"
@@ -60,7 +75,6 @@ const submit = () => {
                                     :message="form.errors.model_name"
                                 />
                             </div>
-
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -155,7 +169,9 @@ const submit = () => {
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
                                 >
                                     <option value="available">Available</option>
-                                    <option value="not_available">Not Available</option>
+                                    <option value="not_available">
+                                        Not Available
+                                    </option>
                                     <option value="under_maintenance">
                                         Under Maintenance
                                     </option>
