@@ -24,7 +24,7 @@ class DashboardController extends Controller
             'available' => Asset::where('status', 'available')->count(),
             'not_available' => Asset::where('status', 'not_available')->count(),
             'assigned' => AssetAssignment::where('status', 'assigned')->count(),
-            'under_maintenance' => AssetMaintenance::whereIn('status', ['reported', 'in_progress'])->count(),
+            'under_maintenance' => Asset::where('status', 'under_maintenance')->count(),
             'pending_requests' => AssetRequest::where('status', 'pending')->count(),
             'total_users' => User::count(),
         ];
