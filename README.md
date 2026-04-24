@@ -228,4 +228,7 @@ The dashboard also shows the five most recent pending requests with inline appro
 
 The employee dashboard shows their own stats, a list of currently assigned assets with options to return or report an issue, and their recent request history.
 
+### Asset Upload
+Asset can be uploaded in bulk quanitity using excel file (xlsx, xlx, csv)
+
 ---
