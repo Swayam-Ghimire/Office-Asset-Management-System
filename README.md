@@ -1,59 +1,231 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Assetify - Office Asset Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A full-stack web application for managing office assets across an organisation. Built with Laravel 12, Inertia.js, and Vue 3, it provides two distinct interfaces — one for administrators and one for employees — covering the full lifecycle of an asset from creation to assignment, maintenance, and disposal.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tech Stack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Backend**
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Package | Version |
+|---|---|
+| inertiajs/inertia-laravel | ^2.0 |
+| spatie/laravel-permission | ^7.2 |
+| maatwebsite/excel | ^3.1 |
+| tightenco/ziggy | ^2.0 |
 
-## Learning Laravel
+**Frontend**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+| Package | Version |
+|---|---|
+| Tailwind CSS | ^3.4 |
+| Font Awesome (Vue) | ^3.1.3 |
+| Chart.js | ^4.5.1 |
+| vue-chartjs | ^5.3.3 |
+| vue3-toastify | ^0.2.9 |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## Requirements
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- PHP 8.2 or higher with the following extensions: `pdo`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`
+- Composer 2.x
+- Node.js 18 or higher and npm
+- MySQL 8.0 or higher (or MariaDB 10.6+)
+- A mail provider account 
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Installation
 
-## Contributing
+Clone the repository and move into the project directory.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+git clone https://github.com/Swayam-Ghimire/Office-Asset-Management-System.git
+cd Office-Asset-Management-System
+```
 
-## Code of Conduct
+Install PHP dependencies.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+composer install
+```
 
-## Security Vulnerabilities
+Install JavaScript dependencies.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+npm install
+```
 
-## License
+Copy the environment file and generate the application key.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+---
+
+## Environment Configuration
+
+Open `.env` and update the following sections before running migrations.
+
+**Database**
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=assetify
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+**Mail**
+
+To use standard SMTP instead (such as Mailtrap for local development):
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_mailtrap_username
+MAIL_PASSWORD=your_mailtrap_password
+```
+
+**Queue**
+
+Notifications and emails are dispatched through the queue. Set the driver to `database` so jobs are stored in MySQL.
+
+```env
+QUEUE_CONNECTION=database
+```
+
+Run the queue tables migration after changing this setting.
+
+```bash
+php artisan queue:table
+php artisan migrate
+```
+
+---
+
+## Running the Application
+
+Start services individually:
+
+```bash
+php artisan serve
+npm run dev
+php artisan queue:work
+```
+
+The application will be available at `http://127.0.0.1:8000`.
+
+After running migrations, create the initial admin account using the seeder artisan command.
+
+```bash
+php artisan db:seed --class=RoleSeeder
+php artisan db:seed --class=CategorySeeder
+php artisan db:seed --class=DepartmentSeeder
+php artisan create:admin
+
+```
+
+
+---
+
+## Queue Worker
+
+Outgoing notifications and emails are queued jobs. The queue worker must be running for them to be delivered.
+
+```bash
+php artisan queue:work
+```
+
+---
+
+## Roles
+
+**Admin**, **Employee**
+
+---
+
+## Core Features
+
+### Asset Management
+
+Assets represent individual physical items in the organisation's inventory. Each asset stores a model name, category, brand, purchase date, condition (new, good, damaged), and status (available, not available, under maintenance).
+
+Admins can create, edit, and soft-delete assets. Soft-deleted assets move to a trash view where they can be restored or permanently deleted. Asset images can be uploaded and stored in the public disk.
+
+Employees and Admin can see all assets. But only admin can access their history.
+
+An activity log is recorded on every significant state change (created, updated, approved, rejected, returned, maintenance reported, maintenance resolved, restored, deleted).
+
+### Request System
+
+Employees browse the asset inventory and submit a request for any available asset, with an optional reason. The system prevents duplicate pending requests for the same asset and uses a database transaction to atomically mark the asset as not available and create the request record, preventing race conditions when two employees request the same asset simultaneously.
+
+Admins review pending requests and approve or reject them. Approving a request creates an assignment record. Rejecting a request returns the asset to available status.
+
+### Assignments
+
+An assignment record is created when a request is approved. It tracks which employee holds which asset, the assignment date, and optionally the return date.
+
+Employees can return assets from their dashboard or from the assignments list. When an asset is returned, the system checks for any open maintenance reports on that asset. If one exists, the asset status is set to under maintenance rather than available, ensuring it is not re-assigned before being serviced.
+
+Admins see all assignments. Employees see only their own.
+
+### Maintenance Workflow
+
+The maintenance system follows a defined status progression: reported, in progress, resolved.
+
+An employee reports an issue on an asset they currently hold. The report includes a text description. The asset is immediately flagged as under maintenance. All admins receive a notification and an email alerting them to the new report.
+
+An admin acknowledges the report by moving it to in progress. This requires the asset to have been returned first — the system blocks the transition if the asset is still assigned. Moving to in progress sets the asset condition to damaged.
+
+An admin resolves the report by selecting the final condition of the repaired asset and optionally writing a resolution note. On resolution, the asset is set back to available with the updated condition.
+
+Admins can also send a return request to the employee currently holding an asset, prompting them to return it so maintenance can begin. This sends both a database notification and an email with an optional admin note explaining the urgency.
+
+No maintenance records are deleted. The full history is preserved and visible in the asset detail view under the maintenance tab.
+
+### Notifications and Email
+
+The system sends notifications through two channels simultaneously: database (shown in the in-app bell icon) and email (dispatched via the queue).
+
+The following events trigger notifications:
+
+| Event | Recipients |
+|---|---|
+| Request approved | Requesting employee |
+| Request rejected | Requesting employee |
+| Maintenance issue reported | All admins |
+| Return requested by admin | Employee holding the asset |
+| Asset returned | All admins |
+
+Notifications are displayed in a dropdown bell menu in the top navigation bar. Unread notifications show a count badge. Individual notifications can be marked as read, or all can be cleared at once. A dedicated notifications page shows the full paginated history with timestamps and links to relevant assets.
+
+### User Management
+
+Admins create employee accounts by providing a name, email, department, role, and status. Credentials is sent to the new user's email automatically.
+
+Admins can edit user details, change roles, activate or deactivate accounts, and delete accounts. An admin cannot delete their own account. The user profile page shows the employee's current assignments and request history.
+
+### Categories and Departments
+
+Categories classify assets (Laptop, Monitor, Chair, and so on). Departments group employees. Both are managed from dedicated admin pages with inline create, edit, and delete. A category cannot be deleted if it has assets assigned to it. A department cannot be deleted if it has employees in it.
+
+### Dashboard and Charts
+
+The admin dashboard shows six summary tiles: total assets, available, assigned, under maintenance, pending requests, and total users. Below the tiles, three charts are rendered using Chart.js via vue-chartjs.
+
+The bar chart shows asset count per category. The doughnut chart shows the distribution of assets across the three statuses with a total count in the centre. The line chart shows the volume of requests submitted per month across the last six months, filling in any months with zero activity so the chart always covers a full six-month window.
+
+The dashboard also shows the five most recent pending requests with inline approve and reject buttons, and a table of the ten most recent assignments.
+
+The employee dashboard shows their own stats, a list of currently assigned assets with options to return or report an issue, and their recent request history.
+
+---
