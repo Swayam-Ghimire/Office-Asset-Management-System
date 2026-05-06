@@ -209,6 +209,31 @@ const hasUnread = props.notifications.data.some((n) => !n.read_at);
                                         class="w-2 h-2"
                                     />
                                 </Link>
+                                <Link
+                                    v-if="notif.data?.approvedLink"
+                                    :href="notif.data.approvedLink"
+                                    @click.stop
+                                    class="text-[11px] font-semibold text-green-600 hover:text-green-800 flex items-center gap-0.5"
+                                >
+                                    View asset
+                                    <fa-icon
+                                        icon="chevron-right"
+                                        class="w-2 h-2"
+                                    />
+                                </Link>
+
+                                <Link
+                                    v-if="notif.data?.rejectedLink"
+                                    :href="notif.data.rejectedLink"
+                                    @click.stop
+                                    class="text-[11px] font-semibold text-red-600 hover:text-red-800 flex items-center gap-0.5"
+                                >
+                                    View asset
+                                    <fa-icon
+                                        icon="chevron-right"
+                                        class="w-2 h-2"
+                                    />
+                                </Link>
 
                                 <!-- Link to related asset -->
                                 <Link
@@ -221,7 +246,11 @@ const hasUnread = props.notifications.data.some((n) => !n.read_at);
                                     "
                                     class="text-xs text-red-600 hover:underline"
                                 >
-                                    View asset →
+                                    View asset 
+                                    <fa-icon
+                                        icon="chevron-right"
+                                        class="w-2 h-2"
+                                    />
                                 </Link>
 
                                 <!-- Link to maintenance index for issue_reported -->
@@ -235,7 +264,11 @@ const hasUnread = props.notifications.data.some((n) => !n.read_at);
                                     :href="route('maintenance.index')"
                                     class="text-xs text-blue-600 hover:underline"
                                 >
-                                    View maintenance →
+                                    View maintenance 
+                                    <fa-icon
+                                        icon="chevron-right"
+                                        class="w-2 h-2"
+                                    />
                                 </Link>
                             </div>
                         </div>

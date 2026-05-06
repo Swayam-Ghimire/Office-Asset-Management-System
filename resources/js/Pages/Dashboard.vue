@@ -221,7 +221,7 @@ function fmt(date) {
             </div>
 
             <!-- Pending requests + request trend line chart -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <!-- Pending requests — 2 cols -->
                 <div
                     class="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden"
@@ -298,7 +298,7 @@ function fmt(date) {
                             </div>
                         </div>
                     </div>
-
+    
                     <div v-else class="px-6 py-12 text-center">
                         <fa-icon
                             icon="circle-check"
@@ -307,11 +307,11 @@ function fmt(date) {
                         <p class="text-sm text-gray-500">No pending requests</p>
                     </div>
                 </div>
-
+                
                 <!-- Request trend chart — 1 col -->
                 <RequestTrendChart
-                    :chart-data="requestTrend"
-                    title="Requests — last 6 months"
+                :chart-data="requestTrend"
+                title="Requests — last 6 months"
                 />
             </div>
 

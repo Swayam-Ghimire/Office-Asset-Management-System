@@ -39,20 +39,20 @@ function requestAsset(assetId) {
 }
 
 const statusColors = {
-    available:        'bg-emerald-100 text-emerald-700 border-emerald-200',
-    not_available:         'bg-blue-100 text-blue-700 border-blue-200',
+    available:'bg-emerald-100 text-emerald-700 border-emerald-200',
+    not_available:'bg-blue-100 text-blue-700 border-blue-200',
     under_maintenance:'bg-amber-100 text-amber-700 border-amber-200',
 };
 
 const conditionColors = {
-    new:     'bg-violet-100 text-violet-700',
-    good:    'bg-sky-100 text-sky-700',
-    damaged: 'bg-rose-100 text-rose-700',
+    new:'bg-violet-100 text-violet-700',
+    good:'bg-sky-100 text-sky-700',
+    damaged:'bg-rose-100 text-rose-700',
 };
 
 const statusDot = {
-    available:        'bg-emerald-400',
-    not_available:         'bg-blue-400',
+    available:'bg-emerald-400',
+    not_available:'bg-blue-400',
     under_maintenance:'bg-amber-400',
 };
 </script>
@@ -142,7 +142,7 @@ const statusDot = {
                         </div>
 
                         <!-- Status -->
-                        <div class="min-w-[150px]">
+                        <div v-if="$page.props.isAdmin" class="min-w-[150px]">
                             <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
                             <select v-model="selectedStatus" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none">
                                 <option value="">All Statuses</option>

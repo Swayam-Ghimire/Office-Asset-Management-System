@@ -15,8 +15,13 @@ class AssetController extends Controller
     public function index(Request $request)
     {
 
-        // scope for employee and admin
         $query = Asset::with('category');
+        
+        // scope for employee and admin
+        if($request->user()->hasRole('employee')) {
+            $query->where('status', 'available');
+        }
+
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {

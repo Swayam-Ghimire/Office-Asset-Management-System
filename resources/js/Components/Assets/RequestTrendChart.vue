@@ -57,7 +57,7 @@ const chartOptions = {
 
 <template>
     <div
-        class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden"
+        class="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden"
     >
         <div class="px-6 py-4 border-b border-gray-100">
             <h2 class="font-semibold text-gray-900 text-sm">{{ title }}</h2>

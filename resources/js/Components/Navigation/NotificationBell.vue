@@ -190,6 +190,30 @@ function timeAgo(dateStr) {
                                         class="w-2 h-2"
                                     />
                                 </Link>
+                                <Link
+                                    v-if="notif.data?.approvedLink"
+                                    :href="notif.data.approvedLink"
+                                    @click.stop
+                                    class="text-[11px] font-semibold text-green-600 hover:text-green-800 flex items-center gap-0.5"
+                                >
+                                    View asset
+                                    <fa-icon
+                                        icon="chevron-right"
+                                        class="w-2 h-2"
+                                    />
+                                </Link>
+                                <Link
+                                    v-if="notif.data?.rejectedLink"
+                                    :href="notif.data.rejectedLink"
+                                    @click.stop
+                                    class="text-[11px] font-semibold text-red-600 hover:text-red-800 flex items-center gap-0.5"
+                                >
+                                    View asset
+                                    <fa-icon
+                                        icon="chevron-right"
+                                        class="w-2 h-2"
+                                    />
+                                </Link>
                             </div>
                         </div>
 

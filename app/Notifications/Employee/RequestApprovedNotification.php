@@ -39,6 +39,7 @@ class RequestApprovedNotification extends Notification implements ShouldQueue
     {
         return [
             'message' => "Your request is approved for asset " . $this->assetRequest->asset->model_name,
+            'approvedLink' => route('assets.show', $this->assetRequest->asset_id),
             'type' => "request_approved",
         ];
     }
