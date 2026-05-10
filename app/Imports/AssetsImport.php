@@ -4,16 +4,22 @@ namespace App\Imports;
 
 use App\Models\Asset;
 use App\Models\Category;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\ShouldQueueWithoutChain;
+use Maatwebsite\Excel\Concerns\SkipsOnError;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Validators\Failure;
+use Override;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Throwable;
 
-class AssetsImport implements ShouldQueueWithoutChain, ToModel, WithChunkReading, WithHeadingRow, WithMapping, WithValidation
+class AssetsImport implements ShouldQueueWithoutChain, ToModel, WithChunkReading, WithHeadingRow, WithMapping, WithValidation, SkipsOnError, SkipsOnFailure
 {
     /**
      * Determine the number of rows to read per chunk.
@@ -54,7 +60,7 @@ class AssetsImport implements ShouldQueueWithoutChain, ToModel, WithChunkReading
     public function rules(): array
     {
         return [
-            'model_name' => 'required|string|max:255',
+            'model_name' => 'required|string|max:255|unique:assets,model_name',
             // VALIDATE BY NAME: This allows the user to see "The category 'Toaster' is invalid"
             'category' => 'required|exists:categories,name',
             'brand' => 'nullable|string',
@@ -68,6 +74,28 @@ class AssetsImport implements ShouldQueueWithoutChain, ToModel, WithChunkReading
     {
         return [
             'category.exists' => 'The category ":input" does not exist. Please use an existing category name.',
+            'model_name.unique' => '":input" record is already present in the database!!'
         ];
+    }
+
+    #[Override]
+    public function onError(Throwable $e)
+    {
+       Log::error('Asset Import Error: ' . $e->getMessage(), [
+            'exception' => $e
+        ]);
+    }
+
+    #[Override]
+    public function onFailure(Failure ...$failures)
+    {
+         foreach ($failures as $failure) {
+            Log::warning('Asset Import Validation Failure:', [
+                'row' => $failure->row(),
+                'attribute' => $failure->attribute(),
+                'errors' => $failure->errors(),
+                'values' => $failure->values(),
+            ]);
+        }
     }
 }

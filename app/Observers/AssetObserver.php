@@ -17,7 +17,7 @@ class AssetObserver
             'asset_id' => $asset->id,
             'user_id' => Auth::id() ?? null,
             'action' => 'created',
-            'remarks' => 'Created by '. Auth::user() ? Auth::user()->id : 'Import by Excel file',
+            'remarks' => Auth::user() ? 'Created by '.Auth::user()->name : 'Import by Excel file',
         ]);
     }
 
@@ -30,7 +30,7 @@ class AssetObserver
             'asset_id' => $asset->id,
             'user_id' => Auth::id(),
             'action' => 'updated',
-            'remarks' => 'Updated by '.Auth::user()->name,
+            'remarks' => 'Updated by '.Auth::user()?->name,
         ]);
     }
 

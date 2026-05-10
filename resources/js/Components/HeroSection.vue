@@ -48,7 +48,7 @@ import { Link } from '@inertiajs/vue3';
             </div>
 
             <!-- CTA Buttons -->
-            <div class="mt-10 flex justify-center gap-4 flex-wrap">
+            <div v-if="!$page.props.auth.user" class="mt-10 flex justify-center gap-4 flex-wrap">
                 <Link
                     :href="route('login')"
                     class="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600"

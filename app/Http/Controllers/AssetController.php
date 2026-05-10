@@ -199,7 +199,7 @@ class AssetController extends Controller
         ]);
         try {
             $importService->importFromExcel($request->file('file'));
-            flash_success('Excel Data Uploaded!!');
+            flash_success('Excel Data Uploaded!! Check all assets for validation');
 
             return back();
         } catch (ValidationException $e) {
